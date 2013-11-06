@@ -1,0 +1,484 @@
+<html> 
+ 
+<head> 
+<title>Octohedron Puzzle 2</title> 
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"> 
+ 
+<script type="text/javascript" src="glMatrix-0.9.5.min.js"></script> 
+<script type="text/javascript" src="webgl-utils.js"></script> 
+<script type="text/javascript" src="move.js"></script> 
+<script type="text/javascript" src="piece.js"></script> 
+<script type="text/javascript" src="pieceSet.js"></script>
+<script type="text/javascript" src="camera.js"></script>  
+<script type="text/javascript" src="puzzle2.js"></script> 
+ 
+<script id="tex-shader-f" type="x-shader/x-fragment"> 
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+ 
+    uniform sampler2D uSampler;
+    varying vec2 vTextureCoord;
+   
+    void main(void) {
+        gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+    }
+</script> 
+ 
+<script id="tex-shader-v" type="x-shader/x-vertex"> 
+    attribute vec3 aVertexPosition;
+    attribute vec2 aTextureCoord;
+ 
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+    uniform mat3 uNMatrix;
+    varying vec2 vTextureCoord;
+ 
+    void main(void) {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        vTextureCoord = aTextureCoord;
+    }
+</script> 
+
+
+
+
+<script id="shader-fs" type="x-shader/x-fragment">
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+
+    varying vec4 vColor;
+
+    void main(void) {
+        gl_FragColor = vColor;
+    }
+</script>
+<script id="shader-vs" type="x-shader/x-vertex">
+    attribute vec3 aVertexPosition;
+
+    uniform mat4 uPMatrix;
+
+    varying vec4 vColor;
+
+    void main(void) {
+        gl_Position = uPMatrix * vec4(aVertexPosition, 1.0);
+        vColor[0] = 0.5;
+        vColor[1] = 0.5;
+        vColor[2] = 1.0;
+        vColor[3] = 1.0;
+    }
+</script>
+
+
+
+
+
+
+ 
+<script type="text/javascript"> 
+
+// Things todo:
+// Perspective camera.
+// Normal maps / lighting.
+// Write a program to seach for moves that make minimal changes.
+// Write a way to save macro moves.
+// Write a way to apply macro moves relative to a face/view.
+// Write a way to intuitively display macro moves:
+//   Unchanged pieces are white.  Arrows to show permutations.
+// Write a method to solve a puzzle using macro moves. (All down hill).
+// Stop the rendering (tick) when nothing changes.
+
+
+
+
+
+var gl;
+var CANVAS_OFFSET_LEFT;
+var CANVAS_OFFSET_TOP;
+
+    function initGL(canvas) {
+        try {
+            gl = canvas.getContext("experimental-webgl");
+            gl.viewportWidth = canvas.width;
+            gl.viewportHeight = canvas.height;
+        } catch (e) {
+        }
+        if (!gl) {
+            alert("Could not initialise WebGL, sorry :-(");
+        }
+    }
+ 
+ 
+    function getShader(gl, id) {
+        var shaderScript = document.getElementById(id);
+        if (!shaderScript) {
+            return null;
+        }
+ 
+        var str = "";
+        var k = shaderScript.firstChild;
+        while (k) {
+            if (k.nodeType == 3) {
+                str += k.textContent;
+            }
+            k = k.nextSibling;
+        }
+ 
+        var shader;
+        if (shaderScript.type == "x-shader/x-fragment") {
+            shader = gl.createShader(gl.FRAGMENT_SHADER);
+        } else if (shaderScript.type == "x-shader/x-vertex") {
+            shader = gl.createShader(gl.VERTEX_SHADER);
+        } else {
+            return null;
+        }
+ 
+        gl.shaderSource(shader, str);
+        gl.compileShader(shader);
+ 
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            alert(gl.getShaderInfoLog(shader));
+            return null;
+        }
+ 
+        return shader;
+    }
+ 
+ 
+    function createProgram(fragmentShaderID, vertexShaderID) {
+        var fragmentShader = getShader(gl, fragmentShaderID);
+        var vertexShader = getShader(gl, vertexShaderID);
+ 
+        var program = gl.createProgram();
+        gl.attachShader(program, vertexShader);
+        gl.attachShader(program, fragmentShader);
+        gl.linkProgram(program);
+ 
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+            alert("Could not initialise shaders");
+        }
+ 
+        program.vertexPositionAttribute = gl.getAttribLocation(program, "aVertexPosition");
+        gl.enableVertexAttribArray(program.vertexPositionAttribute);
+ 
+        program.textureCoordAttribute = gl.getAttribLocation(program, "aTextureCoord");
+        gl.enableVertexAttribArray(program.textureCoordAttribute);
+ 
+        // Camera
+        program.pMatrixUniform = gl.getUniformLocation(program, "uPMatrix");
+        // Piece matrix
+        program.mvMatrixUniform = gl.getUniformLocation(program, "uMVMatrix");
+        // Texture
+        program.samplerUniform = gl.getUniformLocation(program, "uSampler");
+
+        return program;
+    }
+ 
+
+    var imageProgram;
+    var shaderProgram2;
+
+    function initShaders() {
+        imageProgram = createProgram("tex-shader-f", "tex-shader-v");
+
+
+        // --------------------
+
+
+        var fragmentShader2 = getShader(gl, "shader-fs");
+        var vertexShader2 = getShader(gl, "shader-vs");
+
+        shaderProgram2 = gl.createProgram();
+        gl.attachShader(shaderProgram2, vertexShader2);
+        gl.attachShader(shaderProgram2, fragmentShader2);
+        gl.linkProgram(shaderProgram2);
+        if (!gl.getProgramParameter(shaderProgram2, gl.LINK_STATUS)) {
+            alert("Could not initialise shaders");
+        }
+        gl.useProgram(shaderProgram2);
+
+        shaderProgram2.vertexPositionAttribute = gl.getAttribLocation(shaderProgram2, "aVertexPosition");
+        gl.enableVertexAttribArray(shaderProgram2.vertexPositionAttribute);
+
+        shaderProgram2.pMatrixUniform = gl.getUniformLocation(shaderProgram2, "uPMatrix");
+    }
+ 
+ 
+    var CAMERA;
+ 
+    function degToRad(degrees) {
+        return degrees * Math.PI / 180;
+    }
+ 
+    var MOUSE_X;
+    var MOUSE_Y;
+    var mouseButton = 0;
+    var mouseDown = false;
+    var lastMouseX;
+    var lastMouseY;
+    var startMouseX;
+    var startMouseY;
+    var movePair;
+ 
+    function handleMouseDown(event) {
+        mouseDown = true;
+        mouseButton = event.button;
+        startMouseX = lastMouseX = event.clientX-CANVAS_OFFSET_LEFT;
+        startMouseY = lastMouseY = event.clientY-CANVAS_OFFSET_TOP;
+        //lastMouseT = new Date().getTime();
+    } 
+ 
+    function handleMouseUp(event) {
+        mouseDown = false;
+    }
+ 
+    function handleMouseMove(event) {
+        if (!mouseDown) {
+            return;
+        }
+        var newX = event.clientX-CANVAS_OFFSET_LEFT;
+        var newY = event.clientY-CANVAS_OFFSET_TOP;
+        //var newT = new Date().getTime();
+
+        // Middle mouse button initiates a move.
+        if (mouseButton == 1) {
+          if (MOVE != null) {
+            // we are in the middle of a move.
+            // do not start another.
+            return;
+            }
+          if (movePair == null) {
+            movePair = PickPiece(newX,newY,CAMERA);
+          }
+          if (movePair != null) {
+            // Wait a minimum distance to avoid single pixel noise.
+            var dx = newX - startMouseX;
+            var dy = newY - startMouseY;
+            if (Math.sqrt(dx*dx + dy*dy) > 100.0) {
+              var move = ChooseMove(dx,dy,movePair[0],movePair[1]);
+              MOVE_RECORD.push(move);
+              startMove(move, 1000.0);
+              movePair = null;
+            }
+          }
+          return;
+        }
+
+        // I should make this a separate function.       
+        // Mouse left button: Rotate camera. 
+        var deltaX = lastMouseX - newX
+        var deltaY = newY - lastMouseY;
+        
+        deltaX = deltaX * CAMERA.GetWidth() / gl.viewportHeight
+        deltaY = deltaY * CAMERA.GetHeight() / gl.viewportHeight
+
+        // Rotate up and down.
+        CAMERA.Elevation = CAMERA.Elevation - 50*deltaY;
+        if (CAMERA.Elevation > 30.0) {
+          CAMERA.Elevation = 30.0;
+        }
+        if (CAMERA.Elevation < -30.0) {
+          CAMERA.Elevation = -30.0;
+        }
+        
+        // Rotate x around y/up axis.
+        CAMERA.Rotation = CAMERA.Rotation + 50*deltaX;
+        CAMERA.ComputeMatrix();
+
+        lastMouseX = newX
+        lastMouseY = newY;
+        //lastMouseT = newT
+    }
+
+
+
+//------------- Keys ---------------
+
+
+    function handleKeyDown(event) {
+        if (MOVE == null && event.keyCode >= 48 && event.keyCode <= 57) {
+          // digits 0-9
+          var move = MOVES[event.keyCode-48+6];
+          MOVE_RECORD.push(move);
+          startMove(move, 2000.0);
+        }
+        if (event.keyCode == 45) {
+          // Insert key: Test moving the triangle
+          moveTriangle();
+
+        } else if (event.keyCode == 36) {
+          // Home key: Start a new tree.
+        } else if (event.keyCode == 46) {
+          // Delete key: Delete a point from the path.
+        } else if (event.keyCode == 33) {
+          // PageUp: add a point to the path.
+        } else if (event.keyCode == 34) {
+          // PageDown: Add a point to the path
+        }
+
+        if (String.fromCharCode(event.keyCode) == "P") {
+        }
+
+
+        // Cursor keys just move around the view.
+        if (event.keyCode == 37) {
+          // Left cursor key
+	  if (MOVE == null && MOVE_RECORD.length > 0) {
+            var move = MOVE_RECORD.pop();
+            startMove(move.Reverse, 500.0);
+          }
+        } else if (event.keyCode == 39) {
+          // Right cursor key
+        } else if (event.keyCode == 38) {
+          // Up cursor key
+        } else if (event.keyCode == 40) {
+          // Down cursor key
+        }
+    }
+
+
+    function handleKeyUp(event) {
+        if (String.fromCharCode(event.keyCode) == "P") {
+          P_KEY_PRESSED = event;
+        }
+    }
+
+
+    function drawScene() {
+        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        // Draw Pieces ----------------------------------
+        var program = imageProgram;
+        gl.useProgram(program);
+        gl.uniformMatrix4fv(program.pMatrixUniform, false, CAMERA.Matrix);
+
+	DrawPieces(program);
+    }
+ 
+
+    var lastScreenSaverTime;
+    var screenSaverElevationDirection = 1;
+
+    function animateScreenSaver() {
+      if (MOVE == null) {
+        // Randomly select a move.
+        var moveIdx = Math.floor(Math.random() * MOVES.length);
+        if (moveIdx < 0) { moveIdx = 0; }
+        if (moveIdx >= MOVES.length) { moveIdx = MOVES.length - 1; }
+        startMove(MOVES[moveIdx],2000);
+      }
+      // Lets rotate the cub at the same time.
+      if (lastScreenSaverTime == null) {
+        lastScreenSaverTime = new Date().getTime();
+        return;
+      }
+      var currentTime = new Date().getTime();
+      // For debugging
+      //var currentTime = lastScreenSaverTime + 30.0;
+      CAMERA.Rotation += (currentTime-lastScreenSaverTime)/100.0;
+
+      // Now for some up and down motion.
+      var y = CAMERA.Elevation / 30.0;
+      var x = Math.sqrt(1.0-(y*y)) * screenSaverElevationDirection;
+      // Now rotation the vector.
+      var dTheta = (currentTime-lastScreenSaverTime)/2000.0;
+      var c = Math.cos(dTheta);
+      var s = Math.sin(dTheta);
+      var xNew = c*x - s*y;
+      var yNew = c*y + s*x;
+      if (xNew > 0) {
+        screenSaverElevationDirection = 1;
+      } else if (xNew < 0) {
+        screenSaverElevationDirection = -1;
+      } else {
+        screenSaverElevationDirection = 0;
+      }
+      CAMERA.Elevation = 30.0 * yNew;
+      CAMERA.ComputeMatrix();
+
+      lastScreenSaverTime = currentTime;
+    }
+
+
+    var MOVE_RECORD = [];
+    var MOVE;
+    var MOVE_START_TIME;
+    var MOVE_PERIOD;
+
+    function tick() {
+        if (document.getElementById("rotate").checked) {
+          animateScreenSaver();
+        }
+
+        if (MOVE) {
+          animateMove();    
+        }        
+        requestAnimFrame(tick);
+        drawScene();
+    }
+ 
+
+    function startMove(move, period) {
+        MOVE = move;
+        MOVE_START_TIME = new Date().getTime();
+        MOVE_PERIOD = period;
+        move.Start();
+    }  
+
+    function animateMove() { 
+        var elapsedTime = new Date().getTime() - MOVE_START_TIME;
+        if (elapsedTime > MOVE_PERIOD) {
+          // The move is finished
+          MOVE.End();
+          MOVE = null;
+          return;
+        }
+	    
+      // Just set the angle to render the pieces mid move.
+      MOVE.Angle = MOVE.EndAngle * elapsedTime / MOVE_PERIOD;
+      MOVE.ComputeMatrix();
+    }
+ 
+    function webGLStart() {
+        var canvas = document.getElementById("viewer-canvas");
+        initGL(canvas);
+        CANVAS_OFFSET_LEFT = canvas.offsetLeft;
+        CANVAS_OFFSET_TOP  = canvas.offsetTop;
+        initShaders();
+        InitBuffers();
+	InitPieces();
+        InitMoves();
+
+        CAMERA = new Camera(gl.viewportWidth, gl.viewportHeight);
+        InitCamera();
+
+
+        gl.clearColor(0.0, 0.0, 0.2, 1.0);
+        gl.enable(gl.DEPTH_TEST);
+ 
+        canvas.onmousedown = handleMouseDown;
+        document.onmouseup = handleMouseUp;
+        document.onmousemove = handleMouseMove;
+
+        document.onkeydown = handleKeyDown;
+        document.onkeyup = handleKeyUp;
+ 
+        tick();
+    }
+ 
+</script> 
+ 
+ 
+</head> 
+ 
+ 
+<body onload="webGLStart();"> 
+    <canvas id="viewer-canvas" style="border: none;" width="800" height="800"></canvas> 
+    <input type="checkbox" id="rotate" /> Rotate <br/> 
+    <br/> 
+ 
+</body> 
+ 
+</html> 
