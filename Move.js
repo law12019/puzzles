@@ -1,17 +1,26 @@
+// Question: how do pieces store rotation in the same position state?
+
+
+
+
+
+
+
 function Move() {
-    this.Matrix = mat4.create();
-    mat4.identity(this.Matrix);
-    // 8 moves,  components can be 1 or -1.
-    this.Axis = [1,1,1];
-    // Animation angle.
-    this.Angle = 0;
-    //  Move is finished when it reaches this angle.
-    this.EndAngle = 120.0;
-    // We need a list of pieces that this move affects.
-    // We need indexes because pieces change locations.
-    this.PiecePairs = [];
-    // Permutations will references the PieceIndex list.
-    this.Permutation = [];
+  this.Id = -1;
+  this.Matrix = mat4.create();
+  mat4.identity(this.Matrix);
+  // 8 moves,  components can be 1 or -1.
+  this.Axis = [1,1,1];
+  // Animation angle.
+  this.Angle = 0;
+  //  Move is finished when it reaches this angle.
+  this.EndAngle = 120.0;
+  // We need a list of pieces that this move affects.
+  // We need indexes because pieces change locations.
+  this.PiecePairs = [];
+  // Permutations will references the PieceIndex list.
+  this.Permutation = [];
 };
 
 Move.prototype.ComputeMatrix = function () {   
@@ -24,7 +33,7 @@ Move.prototype.ComputeMatrix = function () {
     RotateMatrix(this.Matrix, x, y, z, this.Angle);  
 }
 
-// Initiate a move.  Add move reference to all moving pieces.
+// Initiate a move.  Add a matrix to animate the move..
 Move.prototype.Start = function () {
     var i;
     var piecePair;
@@ -34,14 +43,23 @@ Move.prototype.Start = function () {
         piecePair = this.PiecePairs[i];
         pieceSet = piecePair[0];
         pieceIdx = piecePair[1];
-        pieceSet.Pieces[pieceIdx].Move = this;
+        pieceSet.Pieces[pieceIdx].AnimationMatrix = this.Matrix;
     }
 }
+
+Move.prototype.Middle = function(k) {
+  // Just set the angle to render the pieces mid move.
+  this.Angle = this.EndAngle * k;
+  this.ComputeMatrix();
+}
+
 
 // This is called when a move is finished (animation is done).
 // Change the piece matrixes, and permute the peiceSets.
 // It is a bit complex, but we need a pair (set, idx) to index
 // all of the pieces.  Examples of sets are corners, edges, centers ...
+// To move in one step, just call end.  Start is only necessary to initiate
+// animation / interpolation.
 Move.prototype.End = function() {
     var i;
     var piecePair;
@@ -56,7 +74,7 @@ Move.prototype.End = function() {
         pieceIdx = piecePair[1];
         piece = pieceSet.Pieces[pieceIdx];
 	mat4.multiply(this.Matrix,piece.Matrix,piece.Matrix);
-	piece.Move = null;
+	piece.AnimationMatrix = null;
     }
     this.Angle = 0;
     this.ComputeMatrix();
@@ -96,11 +114,11 @@ Move.prototype.End = function() {
     }
 }
 
-function ChooseMove(dx,dy,pieceSet,piece) {
+function ChooseMove(puzzle,dx,dy,pieceSet,piece) {
     var bestMove = null;
     var bestScore = 0.0;
-    for (var i = 0; i < MOVES.length; ++i) {
-	var move = MOVES[i];
+    for (var i = 0; i < puzzle.Moves.length; ++i) {
+	var move = puzzle.Moves[i];
         // Only consider moves that contain the piece.
         var found = false;
         for (var j = 0; j < move.PiecePairs.length && !found; ++j) {

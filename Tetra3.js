@@ -41,10 +41,10 @@ function InitBuffers() {
     EDGES.AddInTriangle(0,2,3);
     EDGES.InitBuffers();
 
-    CENTERS.AddPoint(-t0[0],-t0[1],-t0[2], 0.95,0.05);
-    CENTERS.AddPoint(-t1[0],-t1[1],-t1[2], 0.05,0.95);
-    CENTERS.AddPoint(-t2[0],-t2[1],-t2[2], 0.05,0.05);
-    CENTERS.AddPoint(-t3[0],-t3[1],-t3[2], 0.95,0.95);
+    CENTERS.AddPoint(-t0[0],-t0[1],-t0[2], 0.945,0.055);
+    CENTERS.AddPoint(-t1[0],-t1[1],-t1[2], 0.055,0.945);
+    CENTERS.AddPoint(-t2[0],-t2[1],-t2[2], 0.055,0.055);
+    CENTERS.AddPoint(-t3[0],-t3[1],-t3[2], 0.945,0.945);
     CENTERS.AddOutTriangle(0,2,1); 
     CENTERS.AddOutTriangle(0,1,3);
     CENTERS.AddInTriangle(1,2,3);
@@ -125,23 +125,17 @@ function InitPieces() {
     CORNERS.Pieces[3].Rotate(t2[0]-m[0], t2[1]-m[1], t2[2]-m[2], 120);
     CORNERS.Pieces[3].Translate(-t2[0]-t0[0],-t2[1]-t0[1],-t2[2]-t0[2]);
 
-
-    CENTERS.Pieces[0] = new Piece("TetraImages/TetraEdge0.jpg");
+    CENTERS.Pieces[0] = new Piece("TetraImages/TetraCenter0.jpg");
     CENTERS.Pieces[0].Translate(t0[0],t0[1],t0[2]);
-
-    CENTERS.Pieces[1] = new Piece("TetraImages/TetraEdge0.jpg");
+    CENTERS.Pieces[1] = new Piece("TetraImages/TetraCenter1.jpg");
     CENTERS.Pieces[1].Rotate(t1[0],t1[1],t1[2], 120);
     CENTERS.Pieces[1].Translate(t0[0],t0[1],t0[2]);
-
-    CENTERS.Pieces[2] = new Piece("TetraImages/TetraEdge0.jpg");
+    CENTERS.Pieces[2] = new Piece("TetraImages/TetraCenter2.jpg");
     CENTERS.Pieces[2].Rotate(t1[0],t1[1],t1[2], -120);
     CENTERS.Pieces[2].Translate(t0[0],t0[1],t0[2]);
-
-    CENTERS.Pieces[3] = new Piece("TetraImages/TetraEdge0.jpg");
+    CENTERS.Pieces[3] = new Piece("TetraImages/TetraCenter3.jpg");
     CENTERS.Pieces[3].Rotate(t2[0],t2[1],t2[2], 120);
     CENTERS.Pieces[3].Translate(t0[0],t0[1],t0[2]);
-
-
 
     // 01
     var v0 = (t0[0]+t1[0]); 
@@ -194,8 +188,6 @@ function InitPieces() {
     EDGES.Pieces[5].Translate(-t2[0],-t2[1],-t2[2]);
     EDGES.Pieces[5].Translate(t0[0],t0[1],t0[2]);
 
-
-
     // 01
     var v0 = (t0[0]+t1[0]); 
     var v1 = (t0[1]+t1[1]); 
@@ -225,7 +217,7 @@ function InitPieces() {
     // 12
     var v0 = (t1[0]+t2[0]); 
     var v1 = (t1[1]+t2[1]); 
-    var v2 = (t1[2]+t2[2]); 
+    var v2 = (t1[2]+t2[2]);
     EDGES.Pieces[9] = new Piece("TetraImages/TetraEdge3.jpg");
     EDGES.Pieces[9].Translate(v0,v1,v2);
     EDGES.Pieces[9].Rotate(v0,v1,v2,90);
@@ -251,51 +243,70 @@ function InitPieces() {
     // They are shaped like corner pieces (Octhedron).
     // I was mastaken that they were pyramids.
     // These edges will need there own texture maps. 
-    PYRAMIDS.Pieces[0] = new Piece("TetraImages/TetraEdge0.jpg");
+    PYRAMIDS.Pieces[0] = new Piece("TetraImages/TetraPyramid0.jpg");
     PYRAMIDS.Pieces[0].Translate(t0[0]+t1[0],t0[1]+t1[1],t0[2]+t1[2]);
 
     m = mid(t0,t2,t3);
-    PYRAMIDS.Pieces[1] = new Piece("TetraImages/TetraEdge1.jpg");
+    PYRAMIDS.Pieces[1] = new Piece("TetraImages/TetraPyramid1.jpg");
     PYRAMIDS.Pieces[1].Rotate(m[0],m[1],m[2], 120);
     PYRAMIDS.Pieces[1].Translate(t0[0]+t1[0],t0[1]+t1[1],t0[2]+t1[2]);
 
-    PYRAMIDS.Pieces[2] = new Piece("TetraImages/TetraEdge2.jpg");
+    PYRAMIDS.Pieces[2] = new Piece("TetraImages/TetraPyramid2.jpg");
     PYRAMIDS.Pieces[2].Rotate(m[0],m[1],m[2], -120);
     PYRAMIDS.Pieces[2].Translate(t0[0]+t1[0],t0[1]+t1[1],t0[2]+t1[2]);
 
     m = mid(t1,t2,t3);
-    PYRAMIDS.Pieces[3] = new Piece("TetraImages/TetraEdge3.jpg");
+    PYRAMIDS.Pieces[3] = new Piece("TetraImages/TetraPyramid3.jpg");
     PYRAMIDS.Pieces[3].Rotate(m[0],m[1],m[2], 120);
     PYRAMIDS.Pieces[3].Translate(t0[0]+t1[0],t0[1]+t1[1],t0[2]+t1[2]);
 
-    PYRAMIDS.Pieces[4] = new Piece("TetraImages/TetraEdge4.jpg");
+    PYRAMIDS.Pieces[4] = new Piece("TetraImages/TetraPyramid4.jpg");
     PYRAMIDS.Pieces[4].Rotate(m[0],m[1],m[2], -120);
     PYRAMIDS.Pieces[4].Translate(t0[0]+t1[0],t0[1]+t1[1],t0[2]+t1[2]);
 
-    PYRAMIDS.Pieces[5] = new Piece("TetraImages/TetraEdge5.jpg");
+    PYRAMIDS.Pieces[5] = new Piece("TetraImages/TetraPyramid5.jpg");
     PYRAMIDS.Pieces[5].Rotate(t1[0]-t0[0],t1[1]-t0[1],t1[2]-t0[2], 180);
     PYRAMIDS.Pieces[5].Translate(t0[0]+t1[0],t0[1]+t1[1],t0[2]+t1[2]);
 }
 
 
 function InitMoves() {
+    // Yellow
     MOVES[0] = new Move();
     MOVES[0].Axis = [t0[0],t0[1],t0[2]];
     MOVES[0].EndAngle = 120.0;
-    MOVES[0].PiecePairs.push([CORNERS,0]);
-    MOVES[0].PiecePairs.push([EDGES,3]);
-    MOVES[0].PiecePairs.push([EDGES,5]);
-    MOVES[0].PiecePairs.push([EDGES,4]);
-    MOVES[0].Permutation = [0, 3,1,2];
+    MOVES[0].PiecePairs.push([CENTERS,0]);
+    MOVES[0].PiecePairs.push([PYRAMIDS,0]);
+    MOVES[0].PiecePairs.push([PYRAMIDS,4]);
+    MOVES[0].PiecePairs.push([PYRAMIDS,3]);
+    MOVES[0].PiecePairs.push([CORNERS,1]);
+    MOVES[0].PiecePairs.push([CORNERS,3]);
+    MOVES[0].PiecePairs.push([CORNERS,2]);
+    MOVES[0].PiecePairs.push([EDGES,0]);
+    MOVES[0].PiecePairs.push([EDGES,1]);
+    MOVES[0].PiecePairs.push([EDGES,8]);
+    MOVES[0].PiecePairs.push([EDGES,6]);
+    MOVES[0].PiecePairs.push([EDGES,7]);
+    MOVES[0].PiecePairs.push([EDGES,2]);
+    MOVES[0].Permutation = [0, 3,1,2, 6,4,5, 9,7,8, 12,10,11];
 
     MOVES[1] = new Move();
     MOVES[1].Axis = [t0[0],t0[1],t0[2]];
     MOVES[1].EndAngle = -120.0;
-    MOVES[1].PiecePairs.push([CORNERS,0]);
-    MOVES[1].PiecePairs.push([EDGES,3]);
-    MOVES[1].PiecePairs.push([EDGES,5]);
-    MOVES[1].PiecePairs.push([EDGES,4]);
-    MOVES[1].Permutation = [0, 2,3,1];
+    MOVES[1].PiecePairs.push([CENTERS,0]);
+    MOVES[1].PiecePairs.push([PYRAMIDS,0]);
+    MOVES[1].PiecePairs.push([PYRAMIDS,4]);
+    MOVES[1].PiecePairs.push([PYRAMIDS,3]);
+    MOVES[1].PiecePairs.push([CORNERS,1]);
+    MOVES[1].PiecePairs.push([CORNERS,3]);
+    MOVES[1].PiecePairs.push([CORNERS,2]);
+    MOVES[1].PiecePairs.push([EDGES,0]);
+    MOVES[1].PiecePairs.push([EDGES,1]);
+    MOVES[1].PiecePairs.push([EDGES,8]);
+    MOVES[1].PiecePairs.push([EDGES,6]);
+    MOVES[1].PiecePairs.push([EDGES,7]);
+    MOVES[1].PiecePairs.push([EDGES,2]);
+    MOVES[1].Permutation = [0, 2,3,1, 5,6,4, 8,9,7, 11,12,10];
 
     MOVES[0].Reverse = MOVES[1];
     MOVES[1].Reverse = MOVES[0];
@@ -303,178 +314,331 @@ function InitMoves() {
     MOVES[2] = new Move();
     MOVES[2].Axis = [t0[0],t0[1],t0[2]];
     MOVES[2].EndAngle = 120.0;
-    MOVES[2].PiecePairs.push([CORNERS,3]);
-    MOVES[2].PiecePairs.push([CORNERS,2]);
-    MOVES[2].PiecePairs.push([CORNERS,1]);
-    MOVES[2].PiecePairs.push([EDGES,0]);
-    MOVES[2].PiecePairs.push([EDGES,1]);
-    MOVES[2].PiecePairs.push([EDGES,2]);
-    MOVES[2].Permutation = [2,0,1, 5,3,4];
+    MOVES[2].PiecePairs.push([CENTERS,3]);
+    MOVES[2].PiecePairs.push([CENTERS,2]);
+    MOVES[2].PiecePairs.push([CENTERS,1]);
+    MOVES[2].PiecePairs.push([PYRAMIDS,2]);
+    MOVES[2].PiecePairs.push([PYRAMIDS,1]);
+    MOVES[2].PiecePairs.push([PYRAMIDS,5]);
+    MOVES[2].PiecePairs.push([EDGES,3]);
+    MOVES[2].PiecePairs.push([EDGES,11]);
+    MOVES[2].PiecePairs.push([EDGES,4]);
+    MOVES[2].Permutation = [2,0,1, 5,3,4, 8,6,7];
 
     MOVES[3] = new Move();
     MOVES[3].Axis = [t0[0],t0[1],t0[2]];
     MOVES[3].EndAngle = -120.0;
-    MOVES[3].PiecePairs.push([CORNERS,3]);
-    MOVES[3].PiecePairs.push([CORNERS,2]);
-    MOVES[3].PiecePairs.push([CORNERS,1]);
-    MOVES[3].PiecePairs.push([EDGES,0]);
-    MOVES[3].PiecePairs.push([EDGES,1]);
-    MOVES[3].PiecePairs.push([EDGES,2]);
-    MOVES[3].Permutation = [1,2,0, 4,5,3];
+    MOVES[3].PiecePairs.push([CENTERS,3]);
+    MOVES[3].PiecePairs.push([CENTERS,2]);
+    MOVES[3].PiecePairs.push([CENTERS,1]);
+    MOVES[3].PiecePairs.push([PYRAMIDS,2]);
+    MOVES[3].PiecePairs.push([PYRAMIDS,1]);
+    MOVES[3].PiecePairs.push([PYRAMIDS,5]);
+    MOVES[3].PiecePairs.push([EDGES,3]);
+    MOVES[3].PiecePairs.push([EDGES,11]);
+    MOVES[3].PiecePairs.push([EDGES,4]);
+    MOVES[3].Permutation = [1,2,0, 4,5,3, 7,8,6];
 
     MOVES[2].Reverse = MOVES[3];
     MOVES[3].Reverse = MOVES[2];
 
 
-
-
-
     MOVES[4] = new Move();
-    MOVES[4].Axis = [t1[0],t1[1],t1[2]];
+    MOVES[4].Axis = [t0[0],t0[1],t0[2]];
     MOVES[4].EndAngle = 120.0;
-    MOVES[4].PiecePairs.push([CORNERS,3]);
-    MOVES[4].PiecePairs.push([EDGES,1]);
-    MOVES[4].PiecePairs.push([EDGES,2]);
+    MOVES[4].PiecePairs.push([CORNERS,0]);
+    MOVES[4].PiecePairs.push([EDGES,9]);
     MOVES[4].PiecePairs.push([EDGES,5]);
+    MOVES[4].PiecePairs.push([EDGES,10]);
     MOVES[4].Permutation = [0, 3,1,2];
 
     MOVES[5] = new Move();
-    MOVES[5].Axis = [t1[0],t1[1],t1[2]];
+    MOVES[5].Axis = [t0[0],t0[1],t0[2]];
     MOVES[5].EndAngle = -120.0;
-    MOVES[5].PiecePairs.push([CORNERS,3]);
-    MOVES[5].PiecePairs.push([EDGES,1]);
-    MOVES[5].PiecePairs.push([EDGES,2]);
+    MOVES[5].PiecePairs.push([CORNERS,0]);
+    MOVES[5].PiecePairs.push([EDGES,9]);
     MOVES[5].PiecePairs.push([EDGES,5]);
+    MOVES[5].PiecePairs.push([EDGES,10]);
     MOVES[5].Permutation = [0, 2,3,1];
 
     MOVES[4].Reverse = MOVES[5];
     MOVES[5].Reverse = MOVES[4];
 
+    // Red
     MOVES[6] = new Move();
     MOVES[6].Axis = [t1[0],t1[1],t1[2]];
     MOVES[6].EndAngle = 120.0;
+    MOVES[6].PiecePairs.push([CENTERS,3]);
+    MOVES[6].PiecePairs.push([PYRAMIDS,0]);
+    MOVES[6].PiecePairs.push([PYRAMIDS,2]);
+    MOVES[6].PiecePairs.push([PYRAMIDS,1]);
     MOVES[6].PiecePairs.push([CORNERS,0]);
     MOVES[6].PiecePairs.push([CORNERS,1]);
     MOVES[6].PiecePairs.push([CORNERS,2]);
     MOVES[6].PiecePairs.push([EDGES,0]);
-    MOVES[6].PiecePairs.push([EDGES,4]);
+    MOVES[6].PiecePairs.push([EDGES,10]);
     MOVES[6].PiecePairs.push([EDGES,3]);
-    MOVES[6].Permutation = [2,0,1, 5,3,4];
+    MOVES[6].PiecePairs.push([EDGES,4]);
+    MOVES[6].PiecePairs.push([EDGES,9]);
+    MOVES[6].PiecePairs.push([EDGES,6]);
+    MOVES[6].Permutation = [0, 3,1,2, 6,4,5, 9,7,8, 12,10,11];
 
     MOVES[7] = new Move();
     MOVES[7].Axis = [t1[0],t1[1],t1[2]];
     MOVES[7].EndAngle = -120.0;
+    MOVES[7].PiecePairs.push([CENTERS,3]);
+    MOVES[7].PiecePairs.push([PYRAMIDS,0]);
+    MOVES[7].PiecePairs.push([PYRAMIDS,2]);
+    MOVES[7].PiecePairs.push([PYRAMIDS,1]);
     MOVES[7].PiecePairs.push([CORNERS,0]);
     MOVES[7].PiecePairs.push([CORNERS,1]);
     MOVES[7].PiecePairs.push([CORNERS,2]);
     MOVES[7].PiecePairs.push([EDGES,0]);
-    MOVES[7].PiecePairs.push([EDGES,4]);
+    MOVES[7].PiecePairs.push([EDGES,10]);
     MOVES[7].PiecePairs.push([EDGES,3]);
-    MOVES[7].Permutation = [1,2,0, 4,5,3];
+    MOVES[7].PiecePairs.push([EDGES,4]);
+    MOVES[7].PiecePairs.push([EDGES,9]);
+    MOVES[7].PiecePairs.push([EDGES,6]);
+    MOVES[7].Permutation = [0, 2,3,1, 5,6,4, 8,9,7, 11,12,10];
 
     MOVES[6].Reverse = MOVES[7];
     MOVES[7].Reverse = MOVES[6];
 
-
     MOVES[8] = new Move();
-    MOVES[8].Axis = [t2[0],t2[1],t2[2]];
+    MOVES[8].Axis = [t1[0],t1[1],t1[2]];
     MOVES[8].EndAngle = 120.0;
-    MOVES[8].PiecePairs.push([CORNERS,2]);
-    MOVES[8].PiecePairs.push([EDGES,0]);
-    MOVES[8].PiecePairs.push([EDGES,4]);
+    MOVES[8].PiecePairs.push([CENTERS,0]);
+    MOVES[8].PiecePairs.push([CENTERS,1]);
+    MOVES[8].PiecePairs.push([CENTERS,2]);
+    MOVES[8].PiecePairs.push([PYRAMIDS,3]);
+    MOVES[8].PiecePairs.push([PYRAMIDS,5]);
+    MOVES[8].PiecePairs.push([PYRAMIDS,4]);
+    MOVES[8].PiecePairs.push([EDGES,1]);
     MOVES[8].PiecePairs.push([EDGES,2]);
-    MOVES[8].Permutation = [0, 3,1,2];
+    MOVES[8].PiecePairs.push([EDGES,5]);
+    MOVES[8].Permutation = [2,0,1, 5,3,4, 8,6,7];
 
     MOVES[9] = new Move();
-    MOVES[9].Axis = [t2[0],t2[1],t2[2]];
+    MOVES[9].Axis = [t1[0],t1[1],t1[2]];
     MOVES[9].EndAngle = -120.0;
-    MOVES[9].PiecePairs.push([CORNERS,2]);
-    MOVES[9].PiecePairs.push([EDGES,0]);
-    MOVES[9].PiecePairs.push([EDGES,4]);
+    MOVES[9].PiecePairs.push([CENTERS,0]);
+    MOVES[9].PiecePairs.push([CENTERS,1]);
+    MOVES[9].PiecePairs.push([CENTERS,2]);
+    MOVES[9].PiecePairs.push([PYRAMIDS,3]);
+    MOVES[9].PiecePairs.push([PYRAMIDS,5]);
+    MOVES[9].PiecePairs.push([PYRAMIDS,4]);
+    MOVES[9].PiecePairs.push([EDGES,1]);
     MOVES[9].PiecePairs.push([EDGES,2]);
-    MOVES[9].Permutation = [0, 2,3,1];
+    MOVES[9].PiecePairs.push([EDGES,5]);
+    MOVES[9].Permutation = [1,2,0, 4,5,3, 7,8,6];
 
     MOVES[8].Reverse = MOVES[9];
     MOVES[9].Reverse = MOVES[8];
 
     MOVES[10] = new Move();
-    MOVES[10].Axis = [t2[0],t2[1],t2[2]];
+    MOVES[10].Axis = [t1[0],t1[1],t1[2]];
     MOVES[10].EndAngle = 120.0;
-    MOVES[10].PiecePairs.push([CORNERS,0]);
     MOVES[10].PiecePairs.push([CORNERS,3]);
-    MOVES[10].PiecePairs.push([CORNERS,1]);
-    MOVES[10].PiecePairs.push([EDGES,1]);
-    MOVES[10].PiecePairs.push([EDGES,3]);
-    MOVES[10].PiecePairs.push([EDGES,5]);
-    MOVES[10].Permutation = [2,0,1, 5,3,4];
+    MOVES[10].PiecePairs.push([EDGES,7]);
+    MOVES[10].PiecePairs.push([EDGES,8]);
+    MOVES[10].PiecePairs.push([EDGES,11]);
+    MOVES[10].Permutation = [0, 3,1,2]
 
     MOVES[11] = new Move();
-    MOVES[11].Axis = [t2[0],t2[1],t2[2]];
+    MOVES[11].Axis = [t1[0],t1[1],t1[2]];
     MOVES[11].EndAngle = -120.0;
-    MOVES[11].PiecePairs.push([CORNERS,0]);
     MOVES[11].PiecePairs.push([CORNERS,3]);
-    MOVES[11].PiecePairs.push([CORNERS,1]);
-    MOVES[11].PiecePairs.push([EDGES,1]);
-    MOVES[11].PiecePairs.push([EDGES,3]);
-    MOVES[11].PiecePairs.push([EDGES,5]);
-    MOVES[11].Permutation = [1,2,0, 4,5,3];
+    MOVES[11].PiecePairs.push([EDGES,7]);
+    MOVES[11].PiecePairs.push([EDGES,8]);
+    MOVES[11].PiecePairs.push([EDGES,11]);
+    MOVES[11].Permutation = [0, 2,3,1]
 
     MOVES[10].Reverse = MOVES[11];
     MOVES[11].Reverse = MOVES[10];
 
-
-
-
-
-
-
+    // Green
     MOVES[12] = new Move();
-    MOVES[12].Axis = [t3[0],t3[1],t3[2]];
+    MOVES[12].Axis = [t2[0],t2[1],t2[2]];
     MOVES[12].EndAngle = 120.0;
+    MOVES[12].PiecePairs.push([CENTERS,2]);
+    MOVES[12].PiecePairs.push([PYRAMIDS,1]);
+    MOVES[12].PiecePairs.push([PYRAMIDS,5]);
+    MOVES[12].PiecePairs.push([PYRAMIDS,4]);
+    MOVES[12].PiecePairs.push([CORNERS,0]);
+    MOVES[12].PiecePairs.push([CORNERS,3]);
     MOVES[12].PiecePairs.push([CORNERS,1]);
-    MOVES[12].PiecePairs.push([EDGES,0]);
-    MOVES[12].PiecePairs.push([EDGES,1]);
     MOVES[12].PiecePairs.push([EDGES,3]);
-    MOVES[12].Permutation = [0, 3,1,2];
+    MOVES[12].PiecePairs.push([EDGES,5]);
+    MOVES[12].PiecePairs.push([EDGES,7]);
+    MOVES[12].PiecePairs.push([EDGES,1]);
+    MOVES[12].PiecePairs.push([EDGES,9]);
+    MOVES[12].PiecePairs.push([EDGES,11]);
+    MOVES[12].Permutation = [0, 3,1,2, 6,4,5, 9,7,8, 12,10,11];
 
     MOVES[13] = new Move();
-    MOVES[13].Axis = [t3[0],t3[1],t3[2]];
+    MOVES[13].Axis = [t2[0],t2[1],t2[2]];
     MOVES[13].EndAngle = -120.0;
+    MOVES[13].PiecePairs.push([CENTERS,2]);
+    MOVES[13].PiecePairs.push([PYRAMIDS,1]);
+    MOVES[13].PiecePairs.push([PYRAMIDS,5]);
+    MOVES[13].PiecePairs.push([PYRAMIDS,4]);
+    MOVES[13].PiecePairs.push([CORNERS,0]);
+    MOVES[13].PiecePairs.push([CORNERS,3]);
     MOVES[13].PiecePairs.push([CORNERS,1]);
-    MOVES[13].PiecePairs.push([EDGES,0]);
-    MOVES[13].PiecePairs.push([EDGES,1]);
     MOVES[13].PiecePairs.push([EDGES,3]);
-    MOVES[13].Permutation = [0, 2,3,1];
+    MOVES[13].PiecePairs.push([EDGES,5]);
+    MOVES[13].PiecePairs.push([EDGES,7]);
+    MOVES[13].PiecePairs.push([EDGES,1]);
+    MOVES[13].PiecePairs.push([EDGES,9]);
+    MOVES[13].PiecePairs.push([EDGES,11]);
+    MOVES[13].Permutation = [0, 2,3,1, 5,6,4, 8,9,7, 11,12,10];
 
     MOVES[12].Reverse = MOVES[13];
     MOVES[13].Reverse = MOVES[12];
 
-//--
-
     MOVES[14] = new Move();
-    MOVES[14].Axis = [t3[0],t3[1],t3[2]];
+    MOVES[14].Axis = [t2[0],t2[1],t2[2]];
     MOVES[14].EndAngle = 120.0;
-    MOVES[14].PiecePairs.push([CORNERS,0]);
-    MOVES[14].PiecePairs.push([CORNERS,2]);
-    MOVES[14].PiecePairs.push([CORNERS,3]);
-    MOVES[14].PiecePairs.push([EDGES,2]);
-    MOVES[14].PiecePairs.push([EDGES,5]);
-    MOVES[14].PiecePairs.push([EDGES,4]);
-    MOVES[14].Permutation = [2,0,1, 5,3,4];
+    MOVES[14].PiecePairs.push([CENTERS,0]);
+    MOVES[14].PiecePairs.push([CENTERS,3]);
+    MOVES[14].PiecePairs.push([CENTERS,1]);
+    MOVES[14].PiecePairs.push([EDGES,6]);
+    MOVES[14].PiecePairs.push([EDGES,10]);
+    MOVES[14].PiecePairs.push([EDGES,8]);
+    MOVES[14].PiecePairs.push([PYRAMIDS,0]);
+    MOVES[14].PiecePairs.push([PYRAMIDS,2]);
+    MOVES[14].PiecePairs.push([PYRAMIDS,3]);
+    MOVES[14].Permutation = [2,0,1, 5,3,4, 8,6,7];
 
     MOVES[15] = new Move();
-    MOVES[15].Axis = [t3[0],t3[1],t3[2]];
+    MOVES[15].Axis = [t2[0],t2[1],t2[2]];
     MOVES[15].EndAngle = -120.0;
-    MOVES[15].PiecePairs.push([CORNERS,0]);
-    MOVES[15].PiecePairs.push([CORNERS,2]);
-    MOVES[15].PiecePairs.push([CORNERS,3]);
-    MOVES[15].PiecePairs.push([EDGES,2]);
-    MOVES[15].PiecePairs.push([EDGES,5]);
-    MOVES[15].PiecePairs.push([EDGES,4]);
-    MOVES[15].Permutation = [1,2,0, 4,5,3];
+    MOVES[15].PiecePairs.push([CENTERS,0]);
+    MOVES[15].PiecePairs.push([CENTERS,3]);
+    MOVES[15].PiecePairs.push([CENTERS,1]);
+    MOVES[15].PiecePairs.push([EDGES,6]);
+    MOVES[15].PiecePairs.push([EDGES,10]);
+    MOVES[15].PiecePairs.push([EDGES,8]);
+    MOVES[15].PiecePairs.push([PYRAMIDS,0]);
+    MOVES[15].PiecePairs.push([PYRAMIDS,2]);
+    MOVES[15].PiecePairs.push([PYRAMIDS,3]);
+    MOVES[15].Permutation = [1,2,0, 4,5,3, 7,8,6];
 
     MOVES[14].Reverse = MOVES[15];
-    MOVES[15].Reverse = MOVES[14];
+    MOVES[15].Reverse = MOVES[14];  
+
+    MOVES[16] = new Move();
+    MOVES[16].Axis = [t2[0],t2[1],t2[2]];
+    MOVES[16].EndAngle = 120.0;
+    MOVES[16].PiecePairs.push([CORNERS,2]);
+    MOVES[16].PiecePairs.push([EDGES,0]);
+    MOVES[16].PiecePairs.push([EDGES,4]);
+    MOVES[16].PiecePairs.push([EDGES,2]);
+    MOVES[16].Permutation = [0, 3,1,2];
+
+    MOVES[17] = new Move();
+    MOVES[17].Axis = [t2[0],t2[1],t2[2]];
+    MOVES[17].EndAngle = -120.0;
+    MOVES[17].PiecePairs.push([CORNERS,2]);
+    MOVES[17].PiecePairs.push([EDGES,0]);
+    MOVES[17].PiecePairs.push([EDGES,4]);
+    MOVES[17].PiecePairs.push([EDGES,2]);
+    MOVES[17].Permutation = [0, 2,3,1];
+
+    MOVES[16].Reverse = MOVES[17];
+    MOVES[17].Reverse = MOVES[16];
+
+    // Purple
+    MOVES[17] = new Move();
+    MOVES[17].Axis = [t3[0],t3[1],t3[2]];
+    MOVES[17].EndAngle = 120.0;
+    MOVES[17].PiecePairs.push([CENTERS,1]);
+    MOVES[17].PiecePairs.push([PYRAMIDS,2]);
+    MOVES[17].PiecePairs.push([PYRAMIDS,3]);
+    MOVES[17].PiecePairs.push([PYRAMIDS,5]);
+    MOVES[17].PiecePairs.push([CORNERS,0]);
+    MOVES[17].PiecePairs.push([CORNERS,2]);
+    MOVES[17].PiecePairs.push([CORNERS,3]);
+    MOVES[17].PiecePairs.push([EDGES,4]);
+    MOVES[17].PiecePairs.push([EDGES,8]);
+    MOVES[17].PiecePairs.push([EDGES,5]);
+    MOVES[17].PiecePairs.push([EDGES,2]);
+    MOVES[17].PiecePairs.push([EDGES,11]);
+    MOVES[17].PiecePairs.push([EDGES,10]);
+    MOVES[17].Permutation = [0, 3,1,2, 6,4,5, 9,7,8, 12,10,11];
+
+    MOVES[18] = new Move();
+    MOVES[18].Axis = [t3[0],t3[1],t3[2]];
+    MOVES[18].EndAngle = -120.0;
+    MOVES[18].PiecePairs.push([CENTERS,1]);
+    MOVES[18].PiecePairs.push([PYRAMIDS,2]);
+    MOVES[18].PiecePairs.push([PYRAMIDS,3]);
+    MOVES[18].PiecePairs.push([PYRAMIDS,5]);
+    MOVES[18].PiecePairs.push([CORNERS,0]);
+    MOVES[18].PiecePairs.push([CORNERS,2]);
+    MOVES[18].PiecePairs.push([CORNERS,3]);
+    MOVES[18].PiecePairs.push([EDGES,4]);
+    MOVES[18].PiecePairs.push([EDGES,8]);
+    MOVES[18].PiecePairs.push([EDGES,5]);
+    MOVES[18].PiecePairs.push([EDGES,2]);
+    MOVES[18].PiecePairs.push([EDGES,11]);
+    MOVES[18].PiecePairs.push([EDGES,10]);
+    MOVES[18].Permutation = [0, 2,3,1, 5,6,4, 8,9,7, 11,12,10];
+
+    MOVES[17].Reverse = MOVES[18];
+    MOVES[18].Reverse = MOVES[17];
+
+    MOVES[19] = new Move();
+    MOVES[19].Axis = [t3[0],t3[1],t3[2]];
+    MOVES[19].EndAngle = 120.0;
+    MOVES[19].PiecePairs.push([CENTERS,0]);
+    MOVES[19].PiecePairs.push([CENTERS,2]);
+    MOVES[19].PiecePairs.push([CENTERS,3]);
+    MOVES[19].PiecePairs.push([EDGES,0]);
+    MOVES[19].PiecePairs.push([EDGES,7]);
+    MOVES[19].PiecePairs.push([EDGES,9]);
+    MOVES[19].PiecePairs.push([PYRAMIDS,0]);
+    MOVES[19].PiecePairs.push([PYRAMIDS,4]);
+    MOVES[19].PiecePairs.push([PYRAMIDS,1]);
+    MOVES[19].Permutation = [2,0,1, 5,3,4, 8,6,7];
+  
+    MOVES[20] = new Move();
+    MOVES[20].Axis = [t3[0],t3[1],t3[2]];
+    MOVES[20].EndAngle = -120.0;
+    MOVES[20].PiecePairs.push([CENTERS,0]);
+    MOVES[20].PiecePairs.push([CENTERS,2]);
+    MOVES[20].PiecePairs.push([CENTERS,3]);
+    MOVES[20].PiecePairs.push([EDGES,0]);
+    MOVES[20].PiecePairs.push([EDGES,7]);
+    MOVES[20].PiecePairs.push([EDGES,9]);
+    MOVES[20].PiecePairs.push([PYRAMIDS,0]);
+    MOVES[20].PiecePairs.push([PYRAMIDS,4]);
+    MOVES[20].PiecePairs.push([PYRAMIDS,1]);
+    MOVES[20].Permutation = [1,2,0, 4,5,3, 7,8,6];
+
+    MOVES[19].Reverse = MOVES[20];
+    MOVES[20].Reverse = MOVES[19];
+
+    MOVES[21] = new Move();
+    MOVES[21].Axis = [t3[0],t3[1],t3[2]];
+    MOVES[21].EndAngle = 120.0;
+    MOVES[21].PiecePairs.push([CORNERS,1]);
+    MOVES[21].PiecePairs.push([EDGES,1]);
+    MOVES[21].PiecePairs.push([EDGES,3]);
+    MOVES[21].PiecePairs.push([EDGES,6]);
+    MOVES[21].Permutation = [0, 3,1,2];
+
+    MOVES[22] = new Move();
+    MOVES[22].Axis = [t3[0],t3[1],t3[2]];
+    MOVES[22].EndAngle = -120.0;
+    MOVES[22].PiecePairs.push([CORNERS,1]);
+    MOVES[22].PiecePairs.push([EDGES,1]);
+    MOVES[22].PiecePairs.push([EDGES,3]);
+    MOVES[22].PiecePairs.push([EDGES,6]);
+    MOVES[22].Permutation = [0, 2,3,1];
+
+    MOVES[21].Reverse = MOVES[22];
+    MOVES[22].Reverse = MOVES[21];
 }
 
 function DrawPieces(program) {

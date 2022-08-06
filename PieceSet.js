@@ -1,15 +1,80 @@
 
 
 function PieceSet() {
-    this.Points = [];
-    this.OutTriangles = [];
-    this.InTriangles = [];
-    this.TextureCoords = [];
-    this.PointBuffer;
-    this.TriangleBuffer;
-    this.TextureCoordBuffer;
-    this.Pieces = [];
-};
+  // Static ivars
+  this.Points = [];
+  this.OutTriangles = [];
+  this.InTriangles = [];
+  this.TextureCoords = [];
+  this.PointBuffer;
+  this.TriangleBuffer;
+  this.TextureCoordBuffer;
+
+  // Although this set stays the same, the array gets permuted and piece matries change.
+  this.Pieces = [];
+
+  // Copy of the pieces in the solution state.
+  this.Solution = [];
+}
+
+
+
+
+PieceSet.prototype.RecordSolution = function () {
+  this.Solution = []
+  for (idx = 0; idx < this.Pieces.length; ++idx) {
+    // Hack to set ids.
+    this.Pieces[idx].Id = idx;
+    this.Solution.push(this.Pieces[idx].Duplicate());
+  }
+}
+
+
+// solution state -> 0.
+PieceSet.prototype.ObjectiveFunction = function () {
+  var count = 0;
+  for (var p_idx = 0; p_idx < this.Solution.length; ++p_idx) {
+    var p0 = this.Pieces[p_idx];
+    var p1 = this.Solution[p_idx];
+    if (p0.Id != p1.Id) {
+      count += 1;
+    } else {
+      // It is the right piece. Is it in the right orientation?
+      for (var m_idx = 0; m_idx < 16; ++m_idx) {
+	if (Math.abs(p0.Matrix[m_idx] - p1.Matrix[m_idx]) > 0.05) {
+	  count += 1;
+	  break;
+	}
+      }
+    }
+  }
+  return count;
+}
+
+  
+PieceSet.prototype.Duplicate = function () {
+  newPieceSet = new PieceSet()
+  newPieceSet.Points = this.Points; 
+  newPieceSet.OutTriangles = this.outTriangles;
+  newPieceSet.InTriangles = this.InTriangles;
+  newPieceSet.PointBuffer = this.PointBuffer;
+  newPieceSet.TriangleBuffer = this.TriangleBuffer;
+  newPieceSet.TextureCoorBuffer = this.TextureCoorBuffer;
+  for (idx = 0; idx < this.Pieces.length; ++idx) {
+    newPieceSet.Pieces.push(this.Pieces[idx].Duplicate);
+  }
+
+  return newPieceSet
+}
+
+
+  
+// Not used like it should be.
+PieceSet.prototype.AddPiece = function (piece) {
+  piece.Id = this.Pieces.length;
+  this.Pieces.push(piece)
+}
+
 
 PieceSet.prototype.AddPoint = function (p0, p1, p2, t0, t1) {
     this.Points.push(p0);

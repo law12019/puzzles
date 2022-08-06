@@ -46,19 +46,40 @@ function RotateMatrix(m, x, y, z, theta) {
 
 
 function Piece(imageSrc, cellBuffer) {
-    this.Matrix = mat4.create();
-    mat4.identity(this.Matrix);
-    this.Texture = null;
+  // Each piece in a set has a unique id which is its initial index in the set.
+  this.Id = 0;
+
+  // The rest is for animation and visualization.
+  this.Matrix = mat4.create();
+  mat4.identity(this.Matrix);
+  this.Texture = null;
+  this.Loaded = false;
+  
+  if (imageSrc != null) {
     this.StartLoad(imageSrc);
-    // Really only need the number of cells in the buffer.
-    this.CellBuffer = cellBuffer;
-    this.Move = null;
+  }
+  // The piece really only needs the number of cells in the buffer.
+  this.CellBuffer = cellBuffer;
+  // Temporary extra matrix to interpolate moves.
+  this.AnimationMatrix = null;
 };
 
 
-// This starts the loading of the tile.
-// Loading is asynchronous, so the tile will not 
-// immediately change its state.
+
+Piece.prototype.Duplicate = function () {
+  newPiece = new Piece(null, null);
+  newPiece.Id = this.Id;
+  newPiece.Texture = this.Texture;
+  newPiece.Loaded = this.Loaded
+  newPiece.CellBuffer = this.CellBuffer;
+  newPiece.Matrix = mat4.create(this.Matrix);
+  return newPiece;
+}
+
+
+
+// This starts the loading of the texture image..
+// Loading is asynchronous.
 Piece.prototype.StartLoad = function (imageSrc) {
     if (this.Texture != null) {
 	return;
@@ -73,10 +94,10 @@ Piece.prototype.StartLoad = function (imageSrc) {
 
 
 function GetLoadTextureFunction (otherThis) {
-    return function () {otherThis.handleLoadedTexture();}
+    return function () {otherThis.HandleLoadedTexture();}
 }
 
-Piece.prototype.handleLoadedTexture = function () {
+Piece.prototype.HandleLoadedTexture = function () {
     var texture = this.Texture;
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -105,15 +126,16 @@ Piece.prototype.Reflect = function (x,y,z) {
 }
 
 Piece.prototype.Translate = function (x,y,z) {
-    var reflect = mat4.create();
-    mat4.identity(reflect);
-    reflect[12] = x;
-    reflect[13] = y;
-    reflect[14] = z;
-    mat4.multiply(this.Matrix,reflect,this.Matrix);
+    var trans = mat4.create();
+    mat4.identity(trans);
+    trans[12] = x;
+    trans[13] = y;
+    trans[14] = z;
+    mat4.multiply(this.Matrix,trans,this.Matrix);
 }
 
 Piece.prototype.RotateZ = function (d) {
+    // d is -1 or 1. This Rotates by 90 degrees.
     var rotate = mat4.create();
     mat4.identity(rotate);
     rotate[0] = 0;
@@ -124,6 +146,7 @@ Piece.prototype.RotateZ = function (d) {
 }
 
 Piece.prototype.RotateY = function (d) {
+    // d is -1 or 1. This Rotates by 90 degrees.
     var rotate = mat4.create();
     mat4.identity(rotate);
     rotate[0] = 0;
@@ -134,6 +157,7 @@ Piece.prototype.RotateY = function (d) {
 }
 
 Piece.prototype.RotateX = function (d) {
+    // d is -1 or 1. This Rotates by 90 degrees.
     var rotate = mat4.create();
     mat4.identity(rotate);
     rotate[5] = 0;
@@ -153,9 +177,9 @@ Piece.prototype.Draw = function (program, numTriangles) {
     gl.bindTexture(gl.TEXTURE_2D, this.Texture);
     gl.uniform1i(program.samplerUniform, 0);
     // Matrix that tranforms the vertex p
-    if (this.Move) {
+    if (this.AnimationMatrix) {
 	var m = mat4.create();
-	mat4.multiply(this.Move.Matrix,this.Matrix, m);
+	mat4.multiply(this.AnimationMatrix,this.Matrix, m);
 	gl.uniformMatrix4fv(program.mvMatrixUniform, false, m);
     } else {
 	gl.uniformMatrix4fv(program.mvMatrixUniform, false, this.Matrix);
