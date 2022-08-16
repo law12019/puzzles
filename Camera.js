@@ -1,19 +1,20 @@
 
 function Camera (viewportWidth, viewportHeight) {
-    this.ViewPlaneNormal = [-1,-1,2];
-    this.Up = [1,1,1];
-    this.Right = [1,-1,0];
+  this.ViewPlaneNormal = [-1,-1,2];
+  this.Up = [1,1,1];
+  this.Right = [1,-1,0];
 
-    this.Elevation = 0;
-    this.Rotation = 0;
-    this.Matrix = mat4.create();
-    this.ViewportWidth = viewportWidth;
-    this.ViewportHeight = viewportHeight;
-    this.Height = 4;
-    this.ComputeMatrix();
+  this.Elevation = 0;
+  this.Rotation = 0;
+  this.Matrix = mat4.create();
+  this.ViewportWidth = viewportWidth;
+  this.ViewportHeight = viewportHeight;
+  this.Height = 4;
+  this.ComputeMatrix();
 
-    this.AnimateElevationAmplitude = 50.0;
-    this.Animate = true;
+  this.AnimateElevationAmplitude = 50.0;
+  this.Animate = true;
+  //this.Animate = false;
 }
 
 

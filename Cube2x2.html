@@ -10,11 +10,14 @@
  
 <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script> 
 <script type="text/javascript" src="webgl-utils.js"></script> 
+<script type="text/javascript" src="utils.js"></script> 
 <script type="text/javascript" src="Move.js"></script> 
+<script type="text/javascript" src="Sequence.js"></script> 
+<script type="text/javascript" src="PieceModel.js"></script> 
 <script type="text/javascript" src="Piece.js"></script> 
-<script type="text/javascript" src="PieceSet.js"></script>
 <script type="text/javascript" src="Camera.js"></script>
 <script type="text/javascript" src="DGui.js"></script>
+<script type="text/javascript" src="Puzzle.js"></script> 
 <script type="text/javascript" src="Cube2x2.js"></script> 
  
 <script id="tex-shader-f" type="x-shader/x-fragment"> 
@@ -276,6 +279,21 @@ body, html {
    </ul>
 </div>
 
+<div>
+  <button type="button" onclick="StartSequence()">Start</button>
+  <button type="button" onclick="PrintSequence()">Print</button>
+</div>
+
+<div>
+  <button type="button" onclick="StartMacro()">Start</button>
+  <button type="button" onclick="StopMacro()">Stop</button>
+  <button type="button" onclick="ReverseMacro()">Reverse</button>
+</div>
+  
+<div>
+  <button type="button" onclick="SolvePuzzle()">Solve</button>
+</div>
+  
 </body> 
  
 </html> 
