@@ -184,6 +184,10 @@ var triangleVertices = [];
 // This returns the picked piece, but also sets PICKED_FACE_NORMAL.
 // This is to disambiguate movesin puzzles with many faces.
 // I do not want moves with the same normal as the picked face.
+
+// Tetra3 puzzle sill having problems.  Try:
+// Use drag to choose the edge of the picked triangle.  Use that to select move.
+// The ideal interaction would be a two step process: first gives feed back, second makes the move.
 function PickPiece (puzzle, state, x0, y0, camera) {
   console.log("----- event " + x0 + ", " + y0);
   var found = false;

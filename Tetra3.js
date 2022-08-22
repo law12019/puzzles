@@ -51,7 +51,7 @@ Puzzle.prototype.InitModels = function() {
   model.InitBuffers();
   this.CornerModel = model;
 
-  // Edge Octo (out checks, but does not work right in practice ... todo:debug).
+  // Edge Octo (out checks) Swapped x, y texture coordinates. Too late to fix now.
   var model = new PieceModel([-s3,-1,s2], 2);
   model.AddPoint(t0[0], t0[1], s2, 0.5,0.5);    // 0: out vert 
   model.AddPoint(t2[0], t2[1], s2, 0.05,0.05);  // 1:
@@ -62,10 +62,10 @@ Puzzle.prototype.InitModels = function() {
   model.AddPoint(t1[0],-t1[1],-s2, 0.5,0.0);   // 6: inside 
   model.AddPoint(t1[0],-t1[1],-s2, 1.0,0.5);   // 7: inside 
   model.AddPoint(t1[0],-t1[1],-s2, 0.5,1.0);   // 8: inside 
-  model.AddOutTriangle(0,2,1); // out face top 
-  model.AddOutTriangle(0,3,4); // out face bottom
-  model.AddInTriangle(0,1,3); //
-  model.AddInTriangle(0,4,2); //
+  model.AddOutTriangle(0,4,2); // out face top 
+  model.AddOutTriangle(0,1,3); // out face bottom
+  model.AddInTriangle(0,2,1); // 
+  model.AddInTriangle(0,3,4); //
   model.AddInTriangle(1,2,5);  //
   model.AddInTriangle(3,1,6);  // 
   model.AddInTriangle(4,3,7);  // 
