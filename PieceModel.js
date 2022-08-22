@@ -1,7 +1,11 @@
 
-
-function PieceModel() {
+// Axis is the axis of rotation to compute possible state matricies.
+// sym_count is the possible number of states. This assume states
+// are distributed evenly around 360 axis rotation.
+function PieceModel(axis, sym_count) {
   // Static ivars
+  this.Axis = axis;
+  this.SymCount = sym_count;
   this.Points = [];
   this.OutTriangles = [];
   this.InTriangles = [];

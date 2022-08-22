@@ -5,7 +5,7 @@ var PUZZLE;
 var STATE;
 var ANIMATION_K = 0;
 var RENDERING = false;
-
+var ANIMATION_DURATION = 2000;
 
 function degToRad(degrees) {
   return degrees * Math.PI / 180;
@@ -21,6 +21,138 @@ var startMouseX;
 var startMouseY;
 var PICKED_PIECE;
 var PICKED_FACE_NORMAL;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var gl;
+
+function getShader(gl, id) {
+  var shaderScript = document.getElementById(id);
+  if (!shaderScript) {
+    return null;
+  }
+
+  var str = "";
+  var k = shaderScript.firstChild;
+  while (k) {
+    if (k.nodeType == 3) {
+      str += k.textContent;
+    }
+    k = k.nextSibling;
+  }
+
+  var shader;
+  if (shaderScript.type == "x-shader/x-fragment") {
+    shader = gl.createShader(gl.FRAGMENT_SHADER);
+  } else if (shaderScript.type == "x-shader/x-vertex") {
+    shader = gl.createShader(gl.VERTEX_SHADER);
+  } else {
+    return null;
+  }
+ 
+  gl.shaderSource(shader, str);
+  gl.compileShader(shader);
+ 
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    alert(gl.getShaderInfoLog(shader));
+    return null;
+  }
+ 
+  return shader;
+}
+ 
+ 
+function createProgram(fragmentShaderID, vertexShaderID) {
+  var fragmentShader = getShader(gl, fragmentShaderID);
+  var vertexShader = getShader(gl, vertexShaderID);
+
+  var program = gl.createProgram();
+  gl.attachShader(program, vertexShader);
+  gl.attachShader(program, fragmentShader);
+  gl.linkProgram(program);
+
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    alert("Could not initialise shaders");
+  }
+ 
+  program.vertexPositionAttribute = gl.getAttribLocation(program, "aVertexPosition");
+  gl.enableVertexAttribArray(program.vertexPositionAttribute);
+ 
+  program.textureCoordAttribute = gl.getAttribLocation(program, "aTextureCoord");
+  gl.enableVertexAttribArray(program.textureCoordAttribute);
+ 
+  // Camera
+  program.pMatrixUniform = gl.getUniformLocation(program, "uPMatrix");
+  // Piece matrix
+  program.mvMatrixUniform = gl.getUniformLocation(program, "uMVMatrix");
+  // Texture
+  program.samplerUniform = gl.getUniformLocation(program, "uSampler");
+
+  return program;
+}
+ 
+
+var imageProgram;
+var shaderProgram2;
+
+function initShaders() {
+  imageProgram = createProgram("tex-shader-f", "tex-shader-v");
+
+  var fragmentShader2 = getShader(gl, "shader-fs");
+  var vertexShader2 = getShader(gl, "shader-vs");
+
+  shaderProgram2 = gl.createProgram();
+  gl.attachShader(shaderProgram2, vertexShader2);
+  gl.attachShader(shaderProgram2, fragmentShader2);
+  gl.linkProgram(shaderProgram2);
+  if (!gl.getProgramParameter(shaderProgram2, gl.LINK_STATUS)) {
+    alert("Could not initialise shaders");
+  }
+  gl.useProgram(shaderProgram2);
+
+  shaderProgram2.vertexPositionAttribute = gl.getAttribLocation(shaderProgram2, "aVertexPosition");
+  gl.enableVertexAttribArray(shaderProgram2.vertexPositionAttribute);
+
+  shaderProgram2.pMatrixUniform = gl.getUniformLocation(shaderProgram2, "uPMatrix");
+}
+ 
+
+function webGLStart() {
+  var canvas = document.getElementById("viewer-canvas");
+  initGL(canvas);
+  initShaders();
+
+  PUZZLE = new Puzzle();
+  CAMERA = new Camera(gl.viewportWidth, gl.viewportHeight);
+  PUZZLE.InitCamera(CAMERA);
+
+  gl.clearColor(0.0, 0.0, 0.2, 1.0);
+  gl.enable(gl.DEPTH_TEST);
+ 
+  canvas.onmousedown = handleMouseDown;
+  document.onmouseup = handleMouseUp;
+  document.onmousemove = handleMouseMove;
+
+  document.onkeydown = handleKeyDown;
+  document.onkeyup = handleKeyUp;
+ 
+  tick();
+}
+ 
+
 
 
 function ComputeFaceNormal (p0, p1, p2) {
@@ -46,18 +178,17 @@ function ComputeCrossMagnitude(a, b) {
 }
 
 
-
-
+//global
+var triangleVertices = [];
 
 // This returns the picked piece, but also sets PICKED_FACE_NORMAL.
 // This is to disambiguate movesin puzzles with many faces.
 // I do not want moves with the same normal as the picked face.
 function PickPiece (puzzle, state, x0, y0, camera) {
+  console.log("----- event " + x0 + ", " + y0);
   var found = false;
   var pickedPiece = null;
   var pickedPieceIdx = -1;
-  //global
-  triangleVertices = [];
   // Convert to view coordinates.
   x0 = (2.0* x0 / camera.ViewportWidth) - 1.0;
   y0 = 1.0 - (2.0* y0 / camera.ViewportWidth);
@@ -103,19 +234,30 @@ function PickPiece (puzzle, state, x0, y0, camera) {
 	// This face intersects.
 	found = true;
 	pickedPiece = piece;
+	console.log("picked piece: " + pickedPiece.Id + ", triangle: " + j);
 	pickedPieceIdx = i;
 	// Choose move can do this evaluation in either state or view coordinates.
 	PICKED_FACE_NORMAL = ComputeFaceNormal(p0,p1,p2);
 	// For debugging
-        //triangleVertices.push(p0[0]*1.001);
-	//triangleVertices.push(p0[1]*1.001);
-	//triangleVertices.push(p0[2]*1.001);
-	//triangleVertices.push(p1[0]*1.001);
-	//triangleVertices.push(p1[1]*1.001);
-	//triangleVertices.push(p1[2]*1.001);
-	//triangleVertices.push(p2[0]*1.001);
-	//triangleVertices.push(p2[1]*1.001);
-	//triangleVertices.push(p2[2]*1.001);
+	if (Math.abs(PICKED_FACE_NORMAL[0]) < 0.001) {
+	  PICKED_FACE_NORMAL[0] = 0;
+	}
+	if (Math.abs(PICKED_FACE_NORMAL[1]) < 0.001) {
+	  PICKED_FACE_NORMAL[1] = 0;
+	}
+	if (Math.abs(PICKED_FACE_NORMAL[2]) < 0.001) {
+	  PICKED_FACE_NORMAL[2] = 0;
+	}
+	// For Debugging
+        triangleVertices.push(p0[0]*1.001);
+	triangleVertices.push(p0[1]*1.001);
+	triangleVertices.push(p0[2]*1.001);
+	triangleVertices.push(p1[0]*1.001);
+	triangleVertices.push(p1[1]*1.001);
+	triangleVertices.push(p1[2]*1.001);
+	triangleVertices.push(p2[0]*1.001);
+	triangleVertices.push(p2[1]*1.001);
+	triangleVertices.push(p2[2]*1.001);
       }
     }
   }
@@ -125,20 +267,57 @@ function PickPiece (puzzle, state, x0, y0, camera) {
 
 
 
+var gl;
+var CANVAS;
 
+function initGL(canvas) {
+  try {
+    gl = canvas.getContext("webgl");
+    gl.viewportWidth = canvas.width;
+    gl.viewportHeight = canvas.height;
+    CANVAS = canvas;
+  } catch (e) {
+  }
+  if (!gl) {
+    alert("Could not initialise WebGL, sorry :-(");
+  }
+}
+ 
 
+function getMousePos(canvas, evt) {
+  var rect = canvas.getBoundingClientRect();
+  return {
+    x: evt.clientX - rect.left,
+    y: evt.clientY - rect.top
+  };
+}
+
+// put this outside the event loop..
+//var canvas = document.getElementById("imgCanvas");
+//var context = canvas.getContext("2d");
 
 
 function handleMouseDown(event) {
   mouseButton = event.button;
+  var pos = getMousePos(CANVAS, event);
+  var newX = pos.x;
+  var newY = pos.y;
   if (mouseButton == 1) {
     CAMERA.Animate = false;
     // Hack to stop the move quickly.
     MOVE_PERIOD = 500.0
+    if (MOVE != null) {
+      // we are in the middle of a move.
+      // do not start another.
+      return;
+    }
+    if (PICKED_PIECE == null) {
+      PICKED_PIECE = PickPiece(PUZZLE, STATE, newX,newY,CAMERA);
+    }
   }
   mouseDown = true;
-  startMouseX = lastMouseX = event.clientX-CANVAS_OFFSET_LEFT;
-  startMouseY = lastMouseY = event.clientY-CANVAS_OFFSET_TOP;
+  startMouseX = lastMouseX = newX;
+  startMouseY = lastMouseY = newY;
   //lastMouseT = new Date().getTime();
 } 
 
@@ -150,20 +329,13 @@ function handleMouseMove(event) {
   if (!mouseDown) {
     return;
   }
-  var newX = event.clientX-CANVAS_OFFSET_LEFT;
-  var newY = event.clientY-CANVAS_OFFSET_TOP;
+  var pos = getMousePos(CANVAS, event);  
+  var newX = pos.x;
+  var newY = pos.y;
   //var newT = new Date().getTime();
 
   // Middle mouse button initiates a move.
   if (mouseButton == 1) {
-    if (MOVE != null) {
-      // we are in the middle of a move.
-      // do not start another.
-      return;
-    }
-    if (PICKED_PIECE == null) {
-      PICKED_PIECE = PickPiece(PUZZLE, STATE, newX,newY,CAMERA);
-    }
     if (PICKED_PIECE != null) {
       // Wait a minimum distance to avoid single pixel noise.
       var dx = newX - startMouseX;
@@ -219,19 +391,16 @@ function handleKeyDown(event) {
   if (MOVE == null && event.keyCode >= 48 && event.keyCode <= 57) {
     // digits 0-9
     var idx = event.keyCode-48;
-    console.log("debug " + idx);
+
     //var move = PUZZLE.Moves[idx];
     var move = PUZZLE.Sequences[idx];
+    if (event.shiftKey) {
+      move = move.Reverse;
+    }
+
     //STATE = move.Apply(STATE);
     startMove(move, 2000.0);
     MOVE_RECORD.push(move);
-
-    //var seq = PUZZLE.Sequences[event.keyCode-48];
-    //if (event.shiftKey) {
-    //  seq = seq.Reverse;
-    //}
-    //startMove(seq, 2000.0);
-    //MOVE_RECORD.push(seq);
   }
 
   // Undo moves
@@ -407,7 +576,7 @@ function StopMacro() {
 
 function ReverseMacro() {
   seq = MACRO_SEQUENCE.Reverse;
-  startMove(seq, 2000.0);
+  startMove(seq, ANIMATION_DURATION);
   MOVE_RECORD.push(seq);
 }
 

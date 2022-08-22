@@ -3,6 +3,8 @@ localhost:8000
 
 
 
+
+
 I converted the puzzle structure into a flat list of pieces
 and matricies.  I got rid of piece sets. This greatly simplyfied
 this code. I also got rid of manually specifying permutations.
@@ -22,6 +24,8 @@ I need to figure out a menu to select a puzzle.
 
 
 TODO:
+- Fix scroll event position issue (not translating to wbgl window right).
+- Finish converting Tetra3
 - Debug why pick and drag is choosing the wrong moves.
   I have added an extra comparison that forces moves to be picked on
   faces perpendicular to the axis of rotation.
@@ -30,7 +34,6 @@ TODO:
   I Id did not work completely.
 - Make sure equivalent sequences are not added.
 - Add reverse sequences when expanding symmetries.
-- Finish converting all puzzles. Oly cube2 and cube3 have been converted so far.
 - Make a puzzle that replicates Gwenda's gold gift.
 
 

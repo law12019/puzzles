@@ -3,7 +3,8 @@
 // Save temp matrixes (other objects?) for animation to avoid potential memory leaks.
 
 function Puzzle() {
-  var idx;
+  var pieceIdx;
+  var matrixIndex = 0;
   this.Pieces = [];
   this.Matricies = [];
   this.Moves = [];
@@ -14,14 +15,16 @@ function Puzzle() {
   
   this.InitModels();
   this.InitPieces();
+  this.UpdateMatricies();
   this.InitMoves();
   this.InitSequences();
   this.InitSymmetries();
   this.ExpandSequences();
   
   this.SolutionState = [];
-  for (idx = 0; idx < this.Pieces.length; ++idx) {
-    this.SolutionState.push(this.Pieces[idx].MatrixIndex);
+  for (pieceIdx = 0; pieceIdx < this.Pieces.length; ++pieceIdx) {
+    this.SolutionState.push(matrixIndex);
+    matrixIndex += this.Pieces[pieceIdx].Matricies.length;
   }
   STATE = [...this.SolutionState];
 }
@@ -34,14 +37,24 @@ Puzzle.prototype.GetSolutionState = function () {
 
 
 Puzzle.prototype.AddPiece = function (piece) {
-  piece.MatrixIndex = this.Matricies.length;
   piece.Id = this.Pieces.length;
   this.Pieces.push(piece);
-  this.Matricies = this.Matricies.concat(piece.Matricies);
-  var tmp = Array(piece.Matricies.length).fill(piece.Id);
-  this.LocationEquivalenceSet = this.LocationEquivalenceSet.concat(tmp);
 }
 
+
+Puzzle.prototype.UpdateMatricies = function() {
+  var idx, piece;
+  this.Matricies = [];
+  this.LocationEquivalenceSet = [];
+  for (idx = 0; idx < this.Pieces.length; ++idx) {
+    piece = this.Pieces[idx];
+    piece.UpdateMatricies();
+    this.Matricies = this.Matricies.concat(piece.Matricies);
+    var tmp = Array(piece.Matricies.length).fill(piece.Id);
+    this.LocationEquivalenceSet = this.LocationEquivalenceSet.concat(tmp);
+  }
+}
+  
 
 Puzzle.prototype.GetPieceMatrix = function(piece, state) {
   return this.Matricies[state[piece.Id]];
@@ -120,20 +133,6 @@ Puzzle.prototype.LoadSequences = function (seq_info) {
 }
 
 
-// Generate a list of puzzle symmetries.
-Puzzle.prototype.InitSymmetries = function() {
-  transforms = [];
-  transforms.push(GetRotationMatrix(1,0,0, 90));
-  transforms.push(GetRotationMatrix(0,1,0, 90));
-  transforms.push(GetRotationMatrix(0,0,1, 90));
-  var flipMat = mat4.create();
-  mat4.identity(flipMat);
-  flipMat[0] = -1;
-  transforms.push(flipMat);
-  this.LoadSymmetries(transforms);
-}
-
-
 // Compute pieceId permutation from a transformation matrix.
 Puzzle.prototype.ComputePiecePermutation = function (transform) {
   var piecePermutation, pieceIdx, pieceMatrix, location, newPieceIdx;
@@ -142,7 +141,7 @@ Puzzle.prototype.ComputePiecePermutation = function (transform) {
   // This ignores rotation.
   piecePermutation = [];
   for (pieceIdx = 0; pieceIdx < this.Pieces.length; ++pieceIdx) {
-    pieceMatrix = this.Pieces[pieceIdx].Matrix;
+    pieceMatrix = this.Pieces[pieceIdx].Matricies[0];
     location = [pieceMatrix[12], pieceMatrix[13], pieceMatrix[14]]
     mat4.multiplyVec3(transform, location, location);
     newPieceIdx = this.LocationToPieceIndex(location);
@@ -266,7 +265,7 @@ Puzzle.prototype.LocationToPieceIndex = function (vect) {
   // Since pieces are centered at the origin, the translation portion
   // of the matrix indicates its position. 
   for (pieceIdx = 0; pieceIdx < this.Pieces.length; ++pieceIdx) {
-    pieceMatrix = this.Pieces[pieceIdx].Matrix;
+    pieceMatrix = this.Pieces[pieceIdx].Matricies[0];
     if (Math.abs(vect[0] - pieceMatrix[12]) < 0.01 &&
 	Math.abs(vect[1] - pieceMatrix[13]) < 0.01 &&
 	Math.abs(vect[2] - pieceMatrix[14]) < 0.01) {
@@ -309,7 +308,8 @@ Puzzle.prototype.ObjectiveFunction = function(state) {
       count += 0;
     } else if (this.LocationEquivalenceSet[state[idx]] == this.LocationEquivalenceSet[this.SolutionState[idx]]) {
       // Piece in the correct position but wrong orientation.
-      count += 1;
+      //count += 1;
+      count += 2;
     } else {
       count += 2;
     }
@@ -325,7 +325,8 @@ Puzzle.prototype.ExpandSequences = function() {
     return;
   }
   seq = this.Sequences[0];
-  for (sym_idx = 1; sym_idx < this.Symmetries.length; ++sym_idx) {
+  // Identity symmetry is not included
+  for (sym_idx = 0; sym_idx < this.Symmetries.length; ++sym_idx) {
     symmetry = this.Symmetries[sym_idx];
     moves = []
     for (m_idx = 0; m_idx < seq.Moves.length; ++m_idx) {

@@ -10,7 +10,7 @@ Puzzle.prototype.InitCamera = function(camera){
 }
 
 Puzzle.prototype.InitModels = function() {
-  var model = new PieceModel();
+  var model = new PieceModel([1,1,1], 3);
   
   model.AddPoint( 1.0,  1.0,  1.0, 0.50,0.50); //0 (out side point)
   model.AddPoint(-1.0,  1.0,  1.0, 0.01,0.50); //1
@@ -42,14 +42,14 @@ Puzzle.prototype.InitModels = function() {
 
 
 Puzzle.prototype.InitPieces = function() {
-  this.AddPiece(new Piece("CubeImages/Corner0.jpg", this.CornerModel, [-1,-1,-1], [90,0,180], 3));
-  this.AddPiece(new Piece("CubeImages/Corner1.jpg", this.CornerModel, [ 1,-1,-1], [180,0,0], 3));
-  this.AddPiece(new Piece("CubeImages/Corner2.jpg", this.CornerModel, [-1, 1,-1], [0,180,0], 3));
-  this.AddPiece(new Piece("CubeImages/Corner3.jpg", this.CornerModel, [ 1, 1,-1], [-90,0,0], 3));
-  this.AddPiece(new Piece("CubeImages/Corner4.jpg", this.CornerModel, [-1,-1, 1], [90,0,90], 3));
-  this.AddPiece(new Piece("CubeImages/Corner5.jpg", this.CornerModel, [ 1,-1, 1], [90,0,0], 3));
-  this.AddPiece(new Piece("CubeImages/Corner6.jpg", this.CornerModel, [-1, 1, 1], [0,-90,0], 3));
-  this.AddPiece(new Piece("CubeImages/Corner7.jpg", this.CornerModel, [ 1, 1, 1], [0,0,0], 3)); 
+  this.AddPiece(new Piece("CubeImages/Corner0.jpg", this.CornerModel, [-1,-1,-1], [90,0,180]));
+  this.AddPiece(new Piece("CubeImages/Corner1.jpg", this.CornerModel, [ 1,-1,-1], [180,0,0]));
+  this.AddPiece(new Piece("CubeImages/Corner2.jpg", this.CornerModel, [-1, 1,-1], [0,180,0]));
+  this.AddPiece(new Piece("CubeImages/Corner3.jpg", this.CornerModel, [ 1, 1,-1], [-90,0,0]));
+  this.AddPiece(new Piece("CubeImages/Corner4.jpg", this.CornerModel, [-1,-1, 1], [90,0,90]));
+  this.AddPiece(new Piece("CubeImages/Corner5.jpg", this.CornerModel, [ 1,-1, 1], [90,0,0]));
+  this.AddPiece(new Piece("CubeImages/Corner6.jpg", this.CornerModel, [-1, 1, 1], [0,-90,0]));
+  this.AddPiece(new Piece("CubeImages/Corner7.jpg", this.CornerModel, [ 1, 1, 1], [0,0,0])); 
 }
 
 
@@ -83,4 +83,18 @@ Puzzle.prototype.InitSequences = function() {
   this.LoadSequences(seq_info);
 
 }
+
+// Generate a list of puzzle symmetries.
+Puzzle.prototype.InitSymmetries = function() {
+  transforms = [];
+  transforms.push(GetRotationMatrix(1,0,0, 90));
+  transforms.push(GetRotationMatrix(0,1,0, 90));
+  transforms.push(GetRotationMatrix(0,0,1, 90));
+  var flipMat = mat4.create();
+  mat4.identity(flipMat);
+  flipMat[0] = -1;
+  transforms.push(flipMat);
+  this.LoadSymmetries(transforms);
+}
+
 

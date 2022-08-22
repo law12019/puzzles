@@ -1,5 +1,7 @@
-
-function Piece(imageSrc, model, offset, angles, sym_count) {
+// These rotation ars are not good enough. Maybe axis and angle? Is one enough?
+// Angles: Euler angles in degrees to rotate model to first state. order is z,y,x.
+// Rotate is fpr rotation around the axis of symmetry (first)
+function Piece(imageSrc, model, offset, angles=null, rotate=0) {
   this.Matricies = [];
   // The rest is for animation and visualization.
   this.Texture = null;
@@ -8,26 +10,49 @@ function Piece(imageSrc, model, offset, angles, sym_count) {
     this.StartLoad(imageSrc);
   }
 
+  // I am separating matrix from offset because offset has to be applied after rotation
+  // and piece rotation state can be modified in many functions.
+  // Also, offset messes up the rotation of axes (symmetry and rotation).
+  // However, offset is applied to Matricies in UpdateMatricies.
+  this.Offset = offset;
   this.Matrix = mat4.create();
   mat4.identity(this.Matrix);
-  RotateMatrix(this.Matrix, 1,0,0, angles[0]);
-  RotateMatrix(this.Matrix, 0,1,0, angles[1]);
-  RotateMatrix(this.Matrix, 0,0,1, angles[2]);
-  this.Translate(offset[0], offset[1], offset[2]);
+
+  // Legacy
+  // Two ways of setting the matrix that proved not to be general enough.
+  if (angles != null) {
+    RotateMatrix(this.Matrix, 1,0,0, angles[0]);
+    RotateMatrix(this.Matrix, 0,1,0, angles[1]);
+    RotateMatrix(this.Matrix, 0,0,1, angles[2]);
+  }
+  if (rotate != 0) {
+    var axis = model.Axis;
+    RotateMatrix(this.Matrix, axis[0], axis[1], axis[2], rotate);
+  }
 
   // Temporary extra matrix to interpolate moves.
   this.AnimationMatrix = mat4.create();
-
   this.Model = model;
-  
+}
+
+Piece.prototype.UpdateMatricies = function() {
+  var sym_axis = Array(3);
+  mat4.multiplyVec3(this.Matrix, this.Model.Axis, sym_axis);
+
   // Matrix options for this piece.
   // This makes assumptions about the puzzle as a regular polyhedron.
   var matrix = mat4.create(this.Matrix);
-  this.Matricies.push(matrix);
-  sym_angle = 360 / sym_count;
-  for (var idx = 1; idx < sym_count; ++idx) {
+  this.Matricies = [matrix];
+  matrix[12] = this.Offset[0];
+  matrix[13] = this.Offset[1];
+  matrix[14] = this.Offset[2];
+  var sym_angle = 360 / this.Model.SymCount;
+  for (var idx = 1; idx < this.Model.SymCount; ++idx) {
     matrix = mat4.create(matrix);
-    RotateMatrix2(matrix, offset[0], offset[1], offset[2], sym_angle);   
+    RotateMatrix2(matrix, sym_axis[0], sym_axis[1], sym_axis[2], sym_angle);   
+    matrix[12] = this.Offset[0];
+    matrix[13] = this.Offset[1];
+    matrix[14] = this.Offset[2];
     this.Matricies.push(matrix);
   }
 };
@@ -68,11 +93,8 @@ Piece.prototype.HandleLoadedTexture = function () {
 Piece.prototype.Rotate = function (x,y,z, d) {
   var rotate = mat4.create();
   mat4.identity(rotate);
-  RotateMatrix(rotate, x, y, z, d);   
+  RotateMatrix2(rotate, x, y, z, d);   
   mat4.multiply(this.Matrix, rotate, this.Matrix);
-  for (idx = 0; idx < this.Matricies.length; ++idx) {
-    mat4.multiply(this.Matricies[idx], rotate, this.Matricies[idx]);
-  }
 }
 
 Piece.prototype.Reflect = function (x,y,z) {
@@ -82,22 +104,20 @@ Piece.prototype.Reflect = function (x,y,z) {
   reflect[5] = y;
   reflect[10] = z;
   mat4.multiply(this.Matrix,reflect,this.Matrix);
-  for (idx = 0; idx < this.Matricies.length; ++idx) {
-    mat4.multiply(this.Matricies[idx], rotate, this.Matricies[idx]);
-  }
 }
 
-Piece.prototype.Translate = function (x,y,z) {
-  var trans = mat4.create();
-  mat4.identity(trans);
-  trans[12] = x;
-  trans[13] = y;
-  trans[14] = z;
-  mat4.multiply(trans,this.Matrix,this.Matrix);
-  for (idx = 0; idx < this.Matricies.length; ++idx) {
-    mat4.multiply(this.Matricies[idx], rotate, this.Matricies[idx]);
-  }
-}
+// Legacy
+//Piece.prototype.Translate = function (x,y,z) {
+//  var trans = mat4.create();
+//  mat4.identity(trans);
+//  trans[12] = x;
+//  trans[13] = y;
+//  trans[14] = z;
+//  mat4.multiply(trans,this.Matrix,this.Matrix);
+//  for (idx = 0; idx < this.Matricies.length; ++idx) {
+//    mat4.multiply(trans, this.Matricies[idx], this.Matricies[idx]);
+//  }
+//}
 
 Piece.prototype.RotateZ = function (d) {
   // d is -1 or 1. This Rotates by 90 degrees.
@@ -108,9 +128,6 @@ Piece.prototype.RotateZ = function (d) {
   rotate[4] = -d;
   rotate[5] = 0;
   mat4.multiply(this.Matrix,rotate,this.Matrix);
-  for (idx = 0; idx < this.Matricies.length; ++idx) {
-    mat4.multiply(this.Matricies[idx], rotate, this.Matricies[idx]);
-  }
 }
 
 Piece.prototype.RotateY = function (d) {
@@ -122,9 +139,6 @@ Piece.prototype.RotateY = function (d) {
   rotate[8] = -d;
   rotate[10] = 0;
   mat4.multiply(this.Matrix,rotate,this.Matrix);
-  for (idx = 0; idx < this.Matricies.length; ++idx) {
-    mat4.multiply(this.Matricies[idx], rotate, this.Matricies[idx]);
-  }
 }
 
 Piece.prototype.RotateX = function (d) {
@@ -136,9 +150,6 @@ Piece.prototype.RotateX = function (d) {
   rotate[9] = -d;
   rotate[10] = 0;
   mat4.multiply(this.Matrix,rotate,this.Matrix);
-  for (idx = 0; idx < this.Matricies.length; ++idx) {
-    mat4.multiply(this.Matricies[idx], rotate, this.Matricies[idx]);
-  }
 }
 
 Piece.prototype.Draw = function (program, matrix) {

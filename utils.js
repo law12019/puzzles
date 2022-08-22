@@ -1,3 +1,27 @@
+
+function ScaleVector(scalar,vector) {
+  return vector.map(function(x) { return x * scalar; });
+}
+
+function SumVectors(vectors) {
+  var idx, v;
+  result = [...vectors[0]];
+  for (idx = 1; idx < vectors.length; ++idx) {
+    v = vectors[idx];
+    result[0] += v[0];
+    result[1] += v[1];
+    result[2] += v[2];
+  }
+  return result;
+}
+
+// mOut is modified
+function CopyMatrix(mIn, mOut) {
+  for (var idx=0; idx < 16; ++idx) {
+    mOut[idx] = mIn[idx];
+  }
+}
+
 // mOut is modified
 function CopyMatrix(mIn, mOut) {
   for (var idx=0; idx < 16; ++idx) {
