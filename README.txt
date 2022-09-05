@@ -24,11 +24,8 @@ I need to figure out a menu to select a puzzle.
 
 
 TODO:
-- Fix scroll event position issue (not translating to wbgl window right).
-- Finish converting Tetra3
-- Debug why pick and drag is choosing the wrong moves.
-  I have added an extra comparison that forces moves to be picked on
-  faces perpendicular to the axis of rotation.
+- Get rid of scoll bar.
+- Use picked face best edge (most parallel to drag) to constrain move. Tetra3.
 - Add a constraint so the search mill not visit the minimum state found so far.
   I already tried avoiding choosing the reverse move from the parent.
   I Id did not work completely.

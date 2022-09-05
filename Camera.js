@@ -13,8 +13,8 @@ function Camera (viewportWidth, viewportHeight) {
   this.ComputeMatrix();
 
   this.AnimateElevationAmplitude = 50.0;
-  this.Animate = true;
-  //this.Animate = false;
+  //this.Animate = true;
+  this.Animate = false;
 }
 
 

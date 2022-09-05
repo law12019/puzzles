@@ -23,18 +23,12 @@ Puzzle.prototype.InitModels = function() {
   model.AddPoint(-1.0, -1.0, -1.0, 0.50,0.00); //8
   model.AddPoint(-1.0, -1.0, -1.0, 1.00,1.00); //9
 
-  model.AddOutTriangle(0,1,4);
-  model.AddOutTriangle(0,4,2);
-  model.AddOutTriangle(0,2,6);
-  model.AddOutTriangle(0,6,3);
-  model.AddOutTriangle(0,3,5);
-  model.AddOutTriangle(0,5,1);
-  model.AddInTriangle(7,4,1);
-  model.AddInTriangle(7,1,5);
-  model.AddInTriangle(8,6,2);
-  model.AddInTriangle(8,2,4);
-  model.AddInTriangle(9,5,3);
-  model.AddInTriangle(9,3,6);
+  model.AddOutFace([0,1,4,2]);
+  model.AddOutFace([0,2,6,3]);
+  model.AddOutFace([0,3,5,1]);
+  model.AddInFace([7,4,1,5]);
+  model.AddInFace([8,6,2,4]);
+  model.AddInFace([9,5,3,6]);
   model.InitBuffers();
 
   this.CornerModel = model;

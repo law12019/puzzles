@@ -40,14 +40,14 @@ Puzzle.prototype.InitModels = function() {
   model.AddPoint(t0[0],-t0[1],-s2, 0.0,0.25);   // 3: bottom
   model.AddPoint(t1[0],-t1[1],-s2, 1.0,0.25);   // 4:
   model.AddPoint(t2[0],-t2[1],-s2, 0.5,1.0);    // 5:
-  model.AddOutTriangle(0,1,2); // out top
-  model.AddOutTriangle(0,5,1); // out side
-  model.AddOutTriangle(1,4,2);  // out side
-  model.AddOutTriangle(2,3,0); // out side
-  model.AddInTriangle(0,3,5); // in side 
-  model.AddInTriangle(1,5,4); // in side
-  model.AddInTriangle(2,4,3); // in side
-  model.AddInTriangle(3,4,5); // in bottom
+  model.AddOutFace([0,1,2]); // out top
+  model.AddOutFace([0,5,1]); // out side
+  model.AddOutFace([1,4,2]);  // out side
+  model.AddOutFace([2,3,0]); // out side
+  model.AddInFace([0,3,5]); // in side 
+  model.AddInFace([1,5,4]); // in side
+  model.AddInFace([2,4,3]); // in side
+  model.AddInFace([3,4,5]); // in bottom
   model.InitBuffers();
   this.CornerModel = model;
 
@@ -62,14 +62,14 @@ Puzzle.prototype.InitModels = function() {
   model.AddPoint(t1[0],-t1[1],-s2, 0.5,0.0);   // 6: inside 
   model.AddPoint(t1[0],-t1[1],-s2, 1.0,0.5);   // 7: inside 
   model.AddPoint(t1[0],-t1[1],-s2, 0.5,1.0);   // 8: inside 
-  model.AddOutTriangle(0,4,2); // out face top 
-  model.AddOutTriangle(0,1,3); // out face bottom
-  model.AddInTriangle(0,2,1); // 
-  model.AddInTriangle(0,3,4); //
-  model.AddInTriangle(1,2,5);  //
-  model.AddInTriangle(3,1,6);  // 
-  model.AddInTriangle(4,3,7);  // 
-  model.AddInTriangle(2,4,8);  // 
+  model.AddOutFace([0,4,2]); // out face top 
+  model.AddOutFace([0,1,3]); // out face bottom
+  model.AddInFace([0,2,1]); // 
+  model.AddInFace([0,3,4]); //
+  model.AddInFace([1,2,5]);  //
+  model.AddInFace([3,1,6]);  // 
+  model.AddInFace([4,3,7]);  // 
+  model.AddInFace([2,4,8]);  // 
   model.InitBuffers();
   this.OctoEdgeModel = model;
   
@@ -83,10 +83,10 @@ Puzzle.prototype.InitModels = function() {
   model.AddPoint(t2[0],t2[1],t2[2], 0.0,0.5);    // 4: dup of 2
   model.AddPoint(t3[0],t3[1],t3[2], 1.0,0.5);     // 5: dup of 3
   // Faces
-  model.AddOutTriangle(1,0,2); // bottom out
-  model.AddOutTriangle(0,1,3); // top out
-  model.AddInTriangle(0,3,4);
-  model.AddInTriangle(1,2,5);
+  model.AddOutFace([1,0,2]); // bottom out
+  model.AddOutFace([0,1,3]); // top out
+  model.AddInFace([0,3,4]);
+  model.AddInFace([1,2,5]);
   model.InitBuffers();
   this.TetraEdgeModel = model;
 
@@ -98,10 +98,10 @@ Puzzle.prototype.InitModels = function() {
   model.AddPoint(t3[0],t3[1],t3[2], 0.5,1.0); // 3: inside vert
   model.AddPoint(t3[0],t3[1],t3[2], 0.5,0.5); // 4: inside vert
   model.AddPoint(t3[0],t3[1],t3[2], 0.0,0.5); // 5: inside vert
-  model.AddOutTriangle(1,0,2); // out
-  model.AddInTriangle(0,1,3); 
-  model.AddInTriangle(1,2,4);
-  model.AddInTriangle(2,0,5);
+  model.AddOutFace([1,0,2]); // out
+  model.AddInFace([0,1,3]); 
+  model.AddInFace([1,2,4]);
+  model.AddInFace([2,0,5]);
   model.InitBuffers();
   this.TetraCenterModel = model;
 }

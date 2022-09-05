@@ -7,7 +7,9 @@ function PieceModel(axis, sym_count) {
   this.Axis = axis;
   this.SymCount = sym_count;
   this.Points = [];
+  this.Faces = [];
   this.OutTriangles = [];
+  this.OutTrianglesFaceIds = [];
   this.InTriangles = [];
   this.TextureCoords = [];
   this.PointBuffer;
@@ -25,17 +27,36 @@ PieceModel.prototype.AddPoint = function (p0, p1, p2, t0, t1) {
     return (this.TextureCoords.length / 2)-1;
 }
 
+// Face ids (and triangle ids) are right handed.
+// Normal is outward, verts: counterclockwise looking down normal.
+// This is only for picking faces and choosing moves.
+PieceModel.prototype.AddOutFace = function (facePointIds) {
+  var idx;
+  for (idx = 2; idx < facePointIds.length; ++idx) {
+    this.AddOutTriangle(facePointIds[0], facePointIds[idx-1], facePointIds[idx]);
+  }
+  this.Faces.push(facePointIds);
+}
+
+PieceModel.prototype.AddInFace = function (facePointIds) {
+  var idx;
+  for (idx = 2; idx < facePointIds.length; ++idx) {
+    this.AddInTriangle(facePointIds[0], facePointIds[idx-1], facePointIds[idx]);
+  }
+}
 
 PieceModel.prototype.AddInTriangle = function (id0, id1, id2) {
-    this.InTriangles.push(id0);
-    this.InTriangles.push(id1);
-    this.InTriangles.push(id2);
+  this.InTriangles.push(id0);
+  this.InTriangles.push(id1);
+  this.InTriangles.push(id2);
 }
 
 PieceModel.prototype.AddOutTriangle = function (id0, id1, id2) {
-    this.OutTriangles.push(id0);
-    this.OutTriangles.push(id1);
-    this.OutTriangles.push(id2);
+  this.OutTriangles.push(id0);
+  this.OutTriangles.push(id1);
+  this.OutTriangles.push(id2);
+  // Record the face id associated with this triangle.
+  this.OutTrianglesFaceIds.push(this.Faces.length);
 }
 
 PieceModel.prototype.InitBuffers = function () {

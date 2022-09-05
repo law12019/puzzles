@@ -22,43 +22,31 @@ Puzzle.prototype.InitModels = function() {
   model.AddPoint(-1.0, -1.0, -1.0, 0.00,0.50); //7
   model.AddPoint(-1.0, -1.0, -1.0, 0.50,0.00); //8
   model.AddPoint(-1.0, -1.0, -1.0, 1.00,1.00); //9
-  model.AddOutTriangle(0,1,4);
-  model.AddOutTriangle(0,4,2);
-  model.AddOutTriangle(0,2,6);
-  model.AddOutTriangle(0,6,3);
-  model.AddOutTriangle(0,3,5);
-  model.AddOutTriangle(0,5,1);
-  model.AddInTriangle(7,4,1);
-  model.AddInTriangle(7,1,5);
-  model.AddInTriangle(8,6,2);
-  model.AddInTriangle(8,2,4);
-  model.AddInTriangle(9,5,3);
-  model.AddInTriangle(9,3,6);
+  model.AddOutFace([0,1,4,2]);
+  model.AddOutFace([0,2,6,3]);
+  model.AddOutFace([0,3,5,1]);
+  model.AddInFace([7,4,1,5]);
+  model.AddInFace([8,6,2,4]);
+  model.AddInFace([9,5,3,6]);
   model.InitBuffers();
   this.CornerModel = model;
 
   // Center
   model = new PieceModel([1,0,0], 4);
-  model.AddPoint(-1.0,-1.0,-1.0, 0.00,0.00); 
-  model.AddPoint( 1.0,-1.0,-1.0, 0.01,0.01); 
-  model.AddPoint(-1.0, 1.0,-1.0, 1.00,0.00); 
-  model.AddPoint( 1.0, 1.0,-1.0, 0.99,0.01); 
-  model.AddPoint(-1.0,-1.0, 1.0, 0.00,1.00); 
-  model.AddPoint( 1.0,-1.0, 1.0, 0.01,0.99); 
-  model.AddPoint(-1.0, 1.0, 1.0, 1.00,1.00); 
-  model.AddPoint( 1.0, 1.0, 1.0, 0.99,0.99); 
-  model.AddOutTriangle(1,3,7);
-  model.AddOutTriangle(1,7,5);
-  model.AddInTriangle(0,4,6);
-  model.AddInTriangle(0,6,2);
-  model.AddInTriangle(2,6,7);
-  model.AddInTriangle(2,7,3);
-  model.AddInTriangle(0,1,5);
-  model.AddInTriangle(0,5,4);
-  model.AddInTriangle(0,2,3);
-  model.AddInTriangle(0,3,1);
-  model.AddInTriangle(4,5,7);
-  model.AddInTriangle(4,7,6);
+  model.AddPoint(-1.0,-1.0, 1.0, 0.00,0.00); 
+  model.AddPoint( 1.0,-1.0, 1.0, 0.01,0.01);  // 
+  model.AddPoint(-1.0,-1.0,-1.0, 1.00,0.00); 
+  model.AddPoint( 1.0,-1.0,-1.0, 0.99,0.01);  //
+  model.AddPoint(-1.0, 1.0, 1.0, 0.00,1.00); 
+  model.AddPoint( 1.0, 1.0, 1.0, 0.01,0.99);  //
+  model.AddPoint(-1.0, 1.0,-1.0, 1.00,1.00); 
+  model.AddPoint( 1.0, 1.0,-1.0, 0.99,0.99);  //
+  model.AddOutFace([1,3,7,5]);
+  model.AddInFace([0,4,6,2]);
+  model.AddInFace([2,6,7,3]);
+  model.AddInFace([0,1,5,4]);
+  model.AddInFace([0,2,3,1]);
+  model.AddInFace([4,5,7,6]);
   model.InitBuffers();
   this.CenterModel = model;
 
@@ -76,18 +64,12 @@ Puzzle.prototype.InitModels = function() {
   model.AddPoint( 1.0,-1.0, 1.0, 0.99,0.99); // 9
   model.AddPoint(-1.0,-1.0,-1.0, 0.00,1.00); // 10
   model.AddPoint(-1.0,-1.0, 1.0, 1.00,1.00); // 11
-  model.AddInTriangle(0,1,2); // 0
-  model.AddInTriangle(2,1,3); 
-  model.AddOutTriangle(2,3,5); // 2
-  model.AddOutTriangle(5,3,6);
-  model.AddOutTriangle(5,6,8); // 4
-  model.AddOutTriangle(8,6,9);
-  model.AddInTriangle(8,9,10); // 6
-  model.AddInTriangle(10,9,11);
-  model.AddInTriangle(2,5,4);  // 8
-  model.AddInTriangle(4,5,8);
-  model.AddInTriangle(3,7,6);  // 10
-  model.AddInTriangle(6,7,9);
+  model.AddInFace([0,1,3,2]);
+  model.AddOutFace([2,3,6,5]);
+  model.AddOutFace([5,6,9,8]);
+  model.AddInFace([8,9,11,10]);
+  model.AddInFace([2,5,8,4]);
+  model.AddInFace([3,7,9,6]);
   model.InitBuffers();
   this.EdgeModel = model;
 }
@@ -105,30 +87,32 @@ Puzzle.prototype.InitPieces = function() {
   this.AddPiece(new Piece("CubeImages/Corner6.jpg", this.CornerModel, [-3, 3, 3], [0,-90,0]));
   this.AddPiece(new Piece("CubeImages/Corner7.jpg", this.CornerModel, [ 3, 3, 3], [0,0,0]));
   // 8
-  this.AddPiece(new Piece("CubeImages/Center0.jpg", this.CenterModel, [ -3,-1,-1], [0,180,0])); //8
-  this.AddPiece(new Piece("CubeImages/Center0.jpg", this.CenterModel, [ -3, 1,-1], [0,180,0]));
-  this.AddPiece(new Piece("CubeImages/Center0.jpg", this.CenterModel, [ -3,-1, 1], [0,180,0]));
-  this.AddPiece(new Piece("CubeImages/Center0.jpg", this.CenterModel, [ -3, 1, 1], [0,180,0]));
-  this.AddPiece(new Piece("CubeImages/Center1.jpg", this.CenterModel, [ 3,-1,-1], [0,0,0]));    //12
-  this.AddPiece(new Piece("CubeImages/Center1.jpg", this.CenterModel, [ 3, 1,-1], [0,0,0]));
-  this.AddPiece(new Piece("CubeImages/Center1.jpg", this.CenterModel, [ 3,-1, 1], [0,0,0]));
-  this.AddPiece(new Piece("CubeImages/Center1.jpg", this.CenterModel, [ 3, 1, 1], [0,0,0]));
-  this.AddPiece(new Piece("CubeImages/Center2_01.jpg", this.CenterModel, [-1,-3,-1], [0,0,-90])); //16
-  this.AddPiece(new Piece("CubeImages/Center2_11.jpg", this.CenterModel, [ 1,-3,-1], [0,0,-90]));
-  this.AddPiece(new Piece("CubeImages/Center2_00.jpg", this.CenterModel, [-1,-3, 1], [0,0,-90]));
-  this.AddPiece(new Piece("CubeImages/Center2_10.jpg", this.CenterModel, [ 1,-3, 1], [0,0,-90]));
-  this.AddPiece(new Piece("CubeImages/Center3.jpg", this.CenterModel, [-1, 3,-1], [0,0,90]));   // 20
-  this.AddPiece(new Piece("CubeImages/Center3.jpg", this.CenterModel, [ 1, 3,-1], [0,0,90]));
-  this.AddPiece(new Piece("CubeImages/Center3.jpg", this.CenterModel, [-1, 3, 1], [0,0,90]));
-  this.AddPiece(new Piece("CubeImages/Center3.jpg", this.CenterModel, [ 1, 3, 1], [0,0,90]));
-  this.AddPiece(new Piece("CubeImages/Center4.jpg", this.CenterModel, [-1,-1, -3], [0,90,0]));  // 24
-  this.AddPiece(new Piece("CubeImages/Center4.jpg", this.CenterModel, [ 1,-1, -3], [0,90,0]));
-  this.AddPiece(new Piece("CubeImages/Center4.jpg", this.CenterModel, [-1, 1, -3], [0,90,0]));
-  this.AddPiece(new Piece("CubeImages/Center4.jpg", this.CenterModel, [ 1, 1, -3], [0,90,0]));
-  this.AddPiece(new Piece("CubeImages/Center5.jpg", this.CenterModel, [-1,-1, 3], [0,-90,0]));  //28
-  this.AddPiece(new Piece("CubeImages/Center5.jpg", this.CenterModel, [ 1,-1, 3], [0,-90,0]));
-  this.AddPiece(new Piece("CubeImages/Center5.jpg", this.CenterModel, [-1, 1, 3], [0,-90,0]));
-  this.AddPiece(new Piece("CubeImages/Center5.jpg", this.CenterModel, [ 1, 1, 3], [0,-90,0]));
+  this.AddPiece(new Piece("CubeImages/Center0_01.jpg", this.CenterModel, [ -3,-1,-1], [0,180,0])); //8
+  this.AddPiece(new Piece("CubeImages/Center0_00.jpg", this.CenterModel, [ -3, 1,-1], [0,180,0]));
+  this.AddPiece(new Piece("CubeImages/Center0_11.jpg", this.CenterModel, [ -3,-1, 1], [0,180,0]));
+  this.AddPiece(new Piece("CubeImages/Center0_10.jpg", this.CenterModel, [ -3, 1, 1], [0,180,0]));
+
+  this.AddPiece(new Piece("CubeImages/Center1_11.jpg", this.CenterModel, [ 3,-1,-1], [0,0,0]));    //12
+  this.AddPiece(new Piece("CubeImages/Center1_10.jpg", this.CenterModel, [ 3, 1,-1], [0,0,0]));
+  this.AddPiece(new Piece("CubeImages/Center1_01.jpg", this.CenterModel, [ 3,-1, 1], [0,0,0]));
+  this.AddPiece(new Piece("CubeImages/Center1_00.jpg", this.CenterModel, [ 3, 1, 1], [0,0,0]));
+
+  this.AddPiece(new Piece("CubeImages/Center2_11.jpg", this.CenterModel, [-1,-3,-1], [0,0,-90])); //16
+  this.AddPiece(new Piece("CubeImages/Center2_10.jpg", this.CenterModel, [ 1,-3,-1], [0,0,-90]));
+  this.AddPiece(new Piece("CubeImages/Center2_01.jpg", this.CenterModel, [-1,-3, 1], [0,0,-90]));
+  this.AddPiece(new Piece("CubeImages/Center2_00.jpg", this.CenterModel, [ 1,-3, 1], [0,0,-90]));
+  this.AddPiece(new Piece("CubeImages/Center3_10.jpg", this.CenterModel, [-1, 3,-1], [0,0,90]));   // 20
+  this.AddPiece(new Piece("CubeImages/Center3_11.jpg", this.CenterModel, [ 1, 3,-1], [0,0,90]));
+  this.AddPiece(new Piece("CubeImages/Center3_00.jpg", this.CenterModel, [-1, 3, 1], [0,0,90]));
+  this.AddPiece(new Piece("CubeImages/Center3_01.jpg", this.CenterModel, [ 1, 3, 1], [0,0,90]));
+  this.AddPiece(new Piece("CubeImages/Center4_11.jpg", this.CenterModel, [-1,-1, -3], [0,90,0]));  // 24
+  this.AddPiece(new Piece("CubeImages/Center4_01.jpg", this.CenterModel, [ 1,-1, -3], [0,90,0]));
+  this.AddPiece(new Piece("CubeImages/Center4_10.jpg", this.CenterModel, [-1, 1, -3], [0,90,0]));
+  this.AddPiece(new Piece("CubeImages/Center4_00.jpg", this.CenterModel, [ 1, 1, -3], [0,90,0]));
+  this.AddPiece(new Piece("CubeImages/Center5_01.jpg", this.CenterModel, [-1,-1, 3], [0,-90,0]));  //28
+  this.AddPiece(new Piece("CubeImages/Center5_11.jpg", this.CenterModel, [ 1,-1, 3], [0,-90,0]));
+  this.AddPiece(new Piece("CubeImages/Center5_00.jpg", this.CenterModel, [-1, 1, 3], [0,-90,0]));
+  this.AddPiece(new Piece("CubeImages/Center5_10.jpg", this.CenterModel, [ 1, 1, 3], [0,-90,0]));
   // 32 (14)
   this.AddPiece(new Piece("CubeImages/Edge0.jpg", this.EdgeModel, [ 3, 3,-1], [0,0,0])); //32 
   this.AddPiece(new Piece("CubeImages/Edge0.jpg", this.EdgeModel, [ 3, 3, 1], [0,0,0])); 

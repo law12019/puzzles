@@ -20,20 +20,10 @@ var lastMouseY;
 var startMouseX;
 var startMouseY;
 var PICKED_PIECE;
-var PICKED_FACE_NORMAL;
+var PICKED_FACE_COORDS;
 
-
-
-
-
-
-
-
-
-
-
-
-
+//global for debugging
+var triangleVertices = [];
 
 
 
@@ -103,14 +93,14 @@ function createProgram(fragmentShaderID, vertexShaderID) {
 
   return program;
 }
- 
+
 
 var imageProgram;
 var shaderProgram2;
 
 function initShaders() {
   imageProgram = createProgram("tex-shader-f", "tex-shader-v");
-
+  
   var fragmentShader2 = getShader(gl, "shader-fs");
   var vertexShader2 = getShader(gl, "shader-vs");
 
@@ -155,33 +145,7 @@ function webGLStart() {
 
 
 
-function ComputeFaceNormal (p0, p1, p2) {
-  var a = [p1[0]-p0[0], p1[1]-p0[1], p1[2]-p0[2]];
-  var b = [p2[0]-p0[0], p2[1]-p0[1], p2[2]-p0[2]];
-  // Cross product.
-  var n = [a[1]*b[2] - a[2]*b[1],
-	   a[2]*b[0] - a[0]*b[2],
-	   a[0]*b[1] - a[1]*b[0]];
-  var mag = Math.sqrt(n[0]*n[0] + n[1]*n[1] + n[2]*n[2]);
-  n[0] = n[0] / mag;
-  n[1] = n[1] / mag;
-  n[2] = n[2] / mag;
-  return n;
-}
-
-function ComputeCrossMagnitude(a, b) {
-  // Cross product.
-  var n = [a[1]*b[2] - a[2]*b[1],
-	   a[2]*b[0] - a[0]*b[2],
-	   a[0]*b[1] - a[1]*b[0]];
-  return Math.sqrt(n[0]*n[0] + n[1]*n[1] + n[2]*n[2]);
-}
-
-
-//global
-var triangleVertices = [];
-
-// This returns the picked piece, but also sets PICKED_FACE_NORMAL.
+// This returns the picked piece, but also sets PICKED_FACE_COORDS.
 // This is to disambiguate movesin puzzles with many faces.
 // I do not want moves with the same normal as the picked face.
 
@@ -190,6 +154,7 @@ var triangleVertices = [];
 // The ideal interaction would be a two step process: first gives feed back, second makes the move.
 function PickPiece (puzzle, state, x0, y0, camera) {
   console.log("----- event " + x0 + ", " + y0);
+  var matrix, model, idx, j, k, piece;
   var found = false;
   var pickedPiece = null;
   var pickedPieceIdx = -1;
@@ -197,12 +162,12 @@ function PickPiece (puzzle, state, x0, y0, camera) {
   x0 = (2.0* x0 / camera.ViewportWidth) - 1.0;
   y0 = 1.0 - (2.0* y0 / camera.ViewportWidth);
   // Loop through the pieces
-  for (var i = 0; i < puzzle.Pieces.length && ! found; ++i) {
-    var piece = puzzle.Pieces[i];
-    var matrix = puzzle.GetPieceMatrix(piece, state);
-    var model = piece.Model;  
+  for (idx = 0; idx < puzzle.Pieces.length && ! found; ++idx) {
+    piece = puzzle.Pieces[idx];
+    model = piece.Model;  
+    matrix = puzzle.GetPieceMatrix(piece, state);
     // Loop through the visible triangles.
-    for (var j = 0; j < model.OutTriangles.length && ! found; ++j) {
+    for (j = 0; j < model.OutTriangles.length && ! found; ++j) {
       // Get the points for this triangle.
       var pId0 = 3 * model.OutTriangles[j*3];
       var pId1 = 3 * model.OutTriangles[j*3+1];
@@ -225,7 +190,7 @@ function PickPiece (puzzle, state, x0, y0, camera) {
       mat4.multiplyVec4(camera.Matrix,p1,v1);
       mat4.multiplyVec4(camera.Matrix,p2,v2);
       // Get rid of homogenous coordinate.
-      for (var k = 0; k < 3; ++k) {
+      for (k = 0; k < 3; ++k) {
 	v0[k] /= v0[3];
 	v1[k] /= v1[3];
 	v2[k] /= v2[3];
@@ -237,21 +202,11 @@ function PickPiece (puzzle, state, x0, y0, camera) {
 	  CheckPointToEdge(x0,y0,v2,v0)) {
 	// This face intersects.
 	found = true;
+	// Coordinates of the picked triangle in vie coordinates.
 	pickedPiece = piece;
+	pickedFaceId = model.OutTrianglesFaceIds[j];
 	console.log("picked piece: " + pickedPiece.Id + ", triangle: " + j);
-	pickedPieceIdx = i;
-	// Choose move can do this evaluation in either state or view coordinates.
-	PICKED_FACE_NORMAL = ComputeFaceNormal(p0,p1,p2);
-	// For debugging
-	if (Math.abs(PICKED_FACE_NORMAL[0]) < 0.001) {
-	  PICKED_FACE_NORMAL[0] = 0;
-	}
-	if (Math.abs(PICKED_FACE_NORMAL[1]) < 0.001) {
-	  PICKED_FACE_NORMAL[1] = 0;
-	}
-	if (Math.abs(PICKED_FACE_NORMAL[2]) < 0.001) {
-	  PICKED_FACE_NORMAL[2] = 0;
-	}
+	pickedPieceIdx = idx;
 	// For Debugging
         triangleVertices.push(p0[0]*1.001);
 	triangleVertices.push(p0[1]*1.001);
@@ -264,6 +219,20 @@ function PickPiece (puzzle, state, x0, y0, camera) {
 	triangleVertices.push(p2[2]*1.001);
       }
     }
+  }
+
+  // Get the state/position/world coordinates of the picked face.
+  // This is used to pick the best move when we have a drag vector.
+  PICKED_FACE_COORDS = [];
+  matrix = puzzle.GetPieceMatrix(pickedPiece, state);
+  model = pickedPiece.Model;
+  var facePtIds = model.Faces[pickedFaceId];
+  for (idx = 0; idx < facePtIds.length; ++idx) {
+    var ptId = facePtIds[idx];
+    var pt = [model.Points[ptId*3], model.Points[(ptId*3)+1], model.Points[(ptId*3)+2], 1];
+    // Convert from piece/solved to position/state coordinates
+    mat4.multiplyVec4(matrix, pt);
+    PICKED_FACE_COORDS.push(pt);
   }
 
   return pickedPiece;
@@ -345,7 +314,7 @@ function handleMouseMove(event) {
       var dx = newX - startMouseX;
       var dy = newY - startMouseY;
       if (Math.sqrt(dx*dx + dy*dy) > 100.0) {
-        var move = ChooseMove(PUZZLE, STATE, dx, dy, PICKED_PIECE, PICKED_FACE_NORMAL);
+        var move = ChooseMove(PUZZLE, CAMERA, STATE, dx, dy, PICKED_PIECE, PICKED_FACE_COORDS);
 	PICKED_PIECE = null;
 	//console.log("move " + move.Id);
         MOVE_RECORD.push(move);
