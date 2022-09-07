@@ -16,19 +16,21 @@ Puzzle.prototype.InitModels = function() {
   model.AddPoint( 1.0,  1.0,  1.0, 0.50,0.50); //0 (out side point)
   model.AddPoint(-1.0,  1.0,  1.0, 0.01,0.50); //1
   model.AddPoint( 1.0, -1.0,  1.0, 0.50,0.01); //2
-  model.AddPoint( 1.0,  1.0, -1.0, 0.99,0.99); //3
-  model.AddPoint(-1.0, -1.0,  1.0, 0.01,0.01); //4
-  model.AddPoint(-1.0,  1.0, -1.0, 0.01,0.99); //5
-  model.AddPoint( 1.0, -1.0, -1.0, 0.99,0.01); //6
-  model.AddPoint(-1.0, -1.0, -1.0, 0.00,0.50); //7
-  model.AddPoint(-1.0, -1.0, -1.0, 0.50,0.00); //8
-  model.AddPoint(-1.0, -1.0, -1.0, 1.00,1.00); //9
-  model.AddOutFace([0,1,4,2]);
-  model.AddOutFace([0,2,6,3]);
-  model.AddOutFace([0,3,5,1]);
-  model.AddInFace([7,4,1,5]);
-  model.AddInFace([8,6,2,4]);
-  model.AddInFace([9,5,3,6]);
+  model.AddPoint( 1.0,  1.0, -1.0, 0.50,0.99); //3
+  model.AddPoint( 1.0,  1.0, -1.0, 0.99,0.50); //4
+  model.AddPoint(-1.0, -1.0,  1.0, 0.01,0.01); //5
+  model.AddPoint(-1.0,  1.0, -1.0, 0.01,0.99); //6
+  model.AddPoint( 1.0, -1.0, -1.0, 0.99,0.01); //7
+  model.AddPoint(-1.0, -1.0, -1.0, 0.00,0.50); //8
+  model.AddPoint(-1.0, -1.0, -1.0, 0.50,0.00); //9
+  model.AddPoint(-1.0, -1.0, -1.0, 0.50,1.00); //10
+  model.AddPoint( 1.0, -1.0, -1.0, 0.50,1.00); //11
+  model.AddOutFace([0,1,5,2]);
+  model.AddOutFace([0,2,7,4]);
+  model.AddOutFace([0,3,6,1]);
+  model.AddInFace([8,5,1,6]);
+  model.AddInFace([9,7,2,5]);
+  model.AddInFace([10,6,3,11]);
   model.InitBuffers();
   this.CornerModel = model;
 
@@ -89,34 +91,34 @@ Puzzle.prototype.InitModels = function() {
 // Rotation order is z,y,x.  Clockwise when at the origin looking out the axis.
 // Anti clockwise when looking downthe axis at the origin.
 Puzzle.prototype.InitPieces = function() {
-  this.AddPiece(new Piece("CubeImages/Corner0.jpg", this.CornerModel, [-2,-2,-2], [90,0,180]));
-  this.AddPiece(new Piece("CubeImages/Corner1.jpg", this.CornerModel, [ 2,-2,-2], [180,0,0]));
-  this.AddPiece(new Piece("CubeImages/Corner2.jpg", this.CornerModel, [-2, 2,-2], [0,180,0]));
-  this.AddPiece(new Piece("CubeImages/Corner3.jpg", this.CornerModel, [ 2, 2,-2], [-90,0,0]));
-  this.AddPiece(new Piece("CubeImages/Corner4.jpg", this.CornerModel, [-2,-2, 2], [90,0,90]));
-  this.AddPiece(new Piece("CubeImages/Corner5.jpg", this.CornerModel, [ 2,-2, 2], [90,0,0]));
-  this.AddPiece(new Piece("CubeImages/Corner6.jpg", this.CornerModel, [-2, 2, 2], [0,-90,0]));
-  this.AddPiece(new Piece("CubeImages/Corner7.jpg", this.CornerModel, [ 2, 2, 2], [0,0,0])); 
+  this.AddPiece(new Piece("Cube3Images/Corner0_logo.jpg", this.CornerModel, [-2,-2,-2], [90,0,180]));
+  this.AddPiece(new Piece("Cube3Images/Corner1_logo.jpg", this.CornerModel, [ 2,-2,-2], [180,0,0]));
+  this.AddPiece(new Piece("Cube3Images/Corner2_logo.jpg", this.CornerModel, [-2, 2,-2], [0,180,0]));
+  this.AddPiece(new Piece("Cube3Images/Corner3_logo.jpg", this.CornerModel, [ 2, 2,-2], [-90,0,0]));
+  this.AddPiece(new Piece("Cube3Images/Corner4_logo.jpg", this.CornerModel, [-2,-2, 2], [90,0,90]));
+  this.AddPiece(new Piece("Cube3Images/Corner5_logo.jpg", this.CornerModel, [ 2,-2, 2], [90,0,0]));
+  this.AddPiece(new Piece("Cube3Images/Corner6_logo.jpg", this.CornerModel, [-2, 2, 2], [0,-90,0]));
+  this.AddPiece(new Piece("Cube3Images/Corner7_logo.jpg", this.CornerModel, [ 2, 2, 2], [0,0,0])); 
   // 8
-  this.AddPiece(new Piece("CubeImages/Center0.jpg", this.CenterModel, [ -2, 0, 0], [0,180,0])); 
-  this.AddPiece(new Piece("CubeImages/Center1.jpg", this.CenterModel, [ 2, 0, 0], [0,0,0])); 
-  this.AddPiece(new Piece("CubeImages/Center2.jpg", this.CenterModel, [ 0, -2, 0], [0,0,-90])); 
-  this.AddPiece(new Piece("CubeImages/Center3.jpg", this.CenterModel, [ 0, 2, 0], [0,0,90])); 
-  this.AddPiece(new Piece("CubeImages/Center4.jpg", this.CenterModel, [ 0, 0, -2], [0,90,0])); 
-  this.AddPiece(new Piece("CubeImages/Center5.jpg", this.CenterModel, [ 0, 0, 2], [0,-90,0])); 
+  this.AddPiece(new Piece("Cube3Images/Center0_logo.jpg", this.CenterModel, [ -2, 0, 0], [0,180,0])); 
+  this.AddPiece(new Piece("Cube3Images/Center1_logo.jpg", this.CenterModel, [ 2, 0, 0], [0,0,0])); 
+  this.AddPiece(new Piece("Cube3Images/Center2_logo.jpg", this.CenterModel, [ 0, -2, 0], [0,0,-90])); 
+  this.AddPiece(new Piece("Cube3Images/Center3_logo.jpg", this.CenterModel, [ 0, 2, 0], [0,0,90])); 
+  this.AddPiece(new Piece("Cube3Images/Center4_logo.jpg", this.CenterModel, [ 0, 0, -2], [0,90,0])); 
+  this.AddPiece(new Piece("Cube3Images/Center5_logo.jpg", this.CenterModel, [ 0, 0, 2], [0,-90,0])); 
   // 14  5,6, 10,11
-  this.AddPiece(new Piece("CubeImages/Edge0.jpg", this.EdgeModel, [ 2, 2, 0], [0,0,0])); 
-  this.AddPiece(new Piece("CubeImages/Edge1.jpg", this.EdgeModel, [-2, 2, 0], [0,0,90])); 
-  this.AddPiece(new Piece("CubeImages/Edge2.jpg", this.EdgeModel, [-2,-2, 0], [0,0,180]));
-  this.AddPiece(new Piece("CubeImages/Edge3.jpg", this.EdgeModel, [ 2,-2, 0], [0,0,-90])); 
-  this.AddPiece(new Piece("CubeImages/Edge4.jpg", this.EdgeModel, [ 2, 0, 2], [90,0,0])); 
-  this.AddPiece(new Piece("CubeImages/Edge5.jpg", this.EdgeModel, [-2, 0, 2], [90,0,90]));
-  this.AddPiece(new Piece("CubeImages/Edge6.jpg", this.EdgeModel, [-2, 0,-2], [-90,0,90]));
-  this.AddPiece(new Piece("CubeImages/Edge7.jpg", this.EdgeModel, [ 2, 0,-2], [-90,0,0])); 
-  this.AddPiece(new Piece("CubeImages/Edge8.jpg", this.EdgeModel, [ 0, 2, 2], [0,-90,0])); 
-  this.AddPiece(new Piece("CubeImages/Edge9.jpg", this.EdgeModel, [ 0, 2,-2], [0,90,0])); 
-  this.AddPiece(new Piece("CubeImages/Edge10.jpg", this.EdgeModel, [ 0,-2,-2], [0,90,-90]));
-  this.AddPiece(new Piece("CubeImages/Edge11.jpg", this.EdgeModel, [ 0,-2, 2], [0,-90,-90]));
+  this.AddPiece(new Piece("Cube3Images/Edge0_logo.jpg", this.EdgeModel, [ 2, 2, 0], [0,0,0])); 
+  this.AddPiece(new Piece("Cube3Images/Edge1_logo.jpg", this.EdgeModel, [-2, 2, 0], [0,0,90])); 
+  this.AddPiece(new Piece("Cube3Images/Edge2_logo.jpg", this.EdgeModel, [-2,-2, 0], [0,0,180]));
+  this.AddPiece(new Piece("Cube3Images/Edge3_logo.jpg", this.EdgeModel, [ 2,-2, 0], [0,0,-90])); 
+  this.AddPiece(new Piece("Cube3Images/Edge4_logo.jpg", this.EdgeModel, [ 2, 0, 2], [90,0,0])); 
+  this.AddPiece(new Piece("Cube3Images/Edge5_logo.jpg", this.EdgeModel, [-2, 0, 2], [90,0,90]));
+  this.AddPiece(new Piece("Cube3Images/Edge6_logo.jpg", this.EdgeModel, [-2, 0,-2], [-90,0,90]));
+  this.AddPiece(new Piece("Cube3Images/Edge7_logo.jpg", this.EdgeModel, [ 2, 0,-2], [-90,0,0])); 
+  this.AddPiece(new Piece("Cube3Images/Edge8_logo.jpg", this.EdgeModel, [ 0, 2, 2], [0,-90,0])); 
+  this.AddPiece(new Piece("Cube3Images/Edge9_logo.jpg", this.EdgeModel, [ 0, 2,-2], [0,90,0])); 
+  this.AddPiece(new Piece("Cube3Images/Edge10_logo.jpg", this.EdgeModel, [ 0,-2,-2], [0,90,-90]));
+  this.AddPiece(new Piece("Cube3Images/Edge11_logo.jpg", this.EdgeModel, [ 0,-2, 2], [0,-90,-90]));
 }
 
 
